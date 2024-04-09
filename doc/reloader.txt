@@ -1,0 +1,32 @@
+================================================================================
+																 *nvimplugin-reloader*
+This plugin enables to reload file automatically when saved.
+
+================================================================================
+Configuration
+
+							      *reloader.debug*
+Sets logger level to debug. 
+
+							       *reloader.info*
+Sets logger level to info.
+						    *reloader.userCommandName*
+changes the command name to reload the file. Default is PluginMode.
+================================================================================
+Usage
+							     *reloder.setup()*
+Configures the pluging and register user command with name given in configuration. >
+
+    local reloader = require('reloader')
+    reloader.setup(reloader.userCommandName("AAA"), reloader.debug)
+    -- enables AAA as command to reload file after saving
+<
+
+
+
+
+
+
+
+
+vim:tw=78:ts=8:ft=help:norl:
