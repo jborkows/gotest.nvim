@@ -13,6 +13,7 @@ jobs:
             wget https://github.com/neovim/neovim/releases/download/stable/nvim.appimage -P ~/programs
             chmod u+x ~/programs/nvim.appimage
             echo 'export PATH="$PATH:~/programs"'>> ~/.profile
+            mv ~/programs/nvim.appimage ~/programs/nvim 
             source ~/.profile
             mkdir -p ~/.config/nvim
             touch init.lua
