@@ -1,6 +1,6 @@
 local M = {}
 
---- @alias State "success"|"failure"|"N/A"|"run"
+--- @alias State "start"|"success"|"failure"|"N/A"|"run"
 --- table<TestIdentifier,State>
 M.__states = {}
 --- table <TestIdentifier, string[]>
@@ -37,13 +37,14 @@ local stateReactor = function(state, key)
 	M.__states[key] = state
 end
 
-M.onStartTests = function()
-	M.setup()
-end
-
 ---@param message ParsingResult
 M.onParsing = function(message)
 	if message.empty then
+		return
+	end
+
+	if message.event ~= nil and message.event.type == "start" then
+		M.setup()
 		return
 	end
 	if message.event ~= nil then

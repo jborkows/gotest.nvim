@@ -23,7 +23,7 @@ function TestIdentifier.__eq(this, other)
 	.packageName
 end
 
---- @alias EventType "failure"|"run"|"success"
+--- @alias EventType "failure"|"run"|"success"|"start"
 
 ---@param testIdentifier TestIdentifier
 ---@return Event
@@ -55,9 +55,18 @@ local function running(testIdentifier)
 	}
 end
 
+---@return Event
+local function started()
+	return {
+		key = nil,
+		type = "start",
+	}
+end
+
 M.success = success
 M.failure = failure
 M.running = running
+M.started = started
 M.state = state
 
 ---@class Output
@@ -121,7 +130,6 @@ end
 
 M.TestIdentifier = TestIdentifier
 M.ParsingResult = ParsingResult
-M.onStartingTests = state.onStartTests
 M.setup = function()
 	state.setup()
 end
