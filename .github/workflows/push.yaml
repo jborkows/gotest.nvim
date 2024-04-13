@@ -11,7 +11,6 @@ jobs:
       run: |
             mkdir ~/programs
             wget https://github.com/neovim/neovim/releases/download/stable/nvim.appimage -P ~/programs
-            chown 0755 ~/programs/nvim.appimage
             chmod u+x ~/programs/nvim.appimage
             echo 'export PATH="$PATH:~/programs"'>> ~/.profile
             source ~/.profile
