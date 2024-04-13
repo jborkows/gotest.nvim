@@ -14,7 +14,6 @@ jobs:
             chmod u+x ~/programs/nvim.appimage
             echo 'export PATH="$PATH:~/programs"'>> ~/.profile
             mv ~/programs/nvim.appimage ~/programs/nvim 
-            source ~/.profile
             mkdir -p ~/.config/nvim
             touch init.lua
     - name: Install plenary and treesitter
@@ -31,7 +30,6 @@ jobs:
         node-version: 20
     - name: run tests
       run: |
-        source ~/.profile  
-        make tests
+        make tests-ci
 
           
