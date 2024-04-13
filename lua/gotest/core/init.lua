@@ -130,6 +130,7 @@ end
 
 M.TestIdentifier = TestIdentifier
 M.ParsingResult = ParsingResult
+
 M.setup = function()
 	state.setup()
 end
