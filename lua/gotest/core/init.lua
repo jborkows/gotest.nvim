@@ -1,9 +1,10 @@
+local state = require("gotest.core.state")
 local M = {}
 
 --- @class TestIdentifier
 --- @field packageName string
 --- @field testName string
-TestIdentifier = {}
+local TestIdentifier = {}
 TestIdentifier.__index = TestIdentifier
 ---
 ---@param packageName string
@@ -57,7 +58,7 @@ end
 M.success = success
 M.failure = failure
 M.running = running
-M.state = require("gotest.core.state")
+M.state = state
 
 ---@class Output
 ---@field key TestIdentifier|nil
@@ -88,7 +89,7 @@ end
 ---@field event Event | nil
 ---@field output Output | nil
 ---@field empty boolean
-ParsingResult = {}
+local ParsingResult = {}
 ParsingResult.__index = ParsingResult
 
 ---@param event Event|nil
@@ -112,7 +113,7 @@ function ParsingResult:onlyOutput(output)
 	return ParsingResult:new(nil, output)
 end
 
-function ParsingResult:empty()
+function ParsingResult:none()
 	local obj = ParsingResult:new(nil, nil)
 	obj.empty = true
 	return obj
@@ -120,4 +121,7 @@ end
 
 M.TestIdentifier = TestIdentifier
 M.ParsingResult = ParsingResult
+M.setup = function()
+	state.setup()
+end
 return M

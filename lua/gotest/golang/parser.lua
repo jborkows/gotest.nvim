@@ -8,11 +8,11 @@ M.parse = function(text)
 	local json = vim.fn.json_decode(text)
 
 	if not vim.tbl_contains({ "output", "fail", "run", "pass" }, json.Action) then
-		return core.ParsingResult:empty()
+		return core.ParsingResult:none()
 	end
 
 	if json.Test == nil then
-		return core.ParsingResult:empty()
+		return core.ParsingResult:none()
 	end
 	local packageName = json.Package or ""
 	local testName = json.Test or ""
@@ -30,7 +30,7 @@ M.parse = function(text)
 	elseif json.Action == "run" then
 		return core.ParsingResult:onlyEvent(core.running(key))
 	else
-		return core.ParsingResult:empty()
+		return core.ParsingResult:none()
 	end
 end
 

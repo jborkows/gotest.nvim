@@ -50,7 +50,7 @@ M.outputs = function(key)
 	end
 end ---comment
 
-M.clear = function()
+M.setup = function()
 	M.__messages = {}
 	M.__states = {}
 	M.__test_messages = {}
