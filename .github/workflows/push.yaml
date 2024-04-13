@@ -32,9 +32,12 @@ jobs:
     - name: debug
       run: |
           ls ~/programs 
+          source ~/.profile
           echo $PATH
           which nvim
     - name: run tests
-      run: make tests
+      run: |
+        source ~/.profile  
+        make tests
 
           
