@@ -23,7 +23,7 @@ jobs:
          git clone --depth 1 https://github.com/nvim-treesitter/nvim-treesitter \
            "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/pack/packer/start/nvim-treesitter
          echo "require'nvim-treesitter.configs'.setup { \
-           ensure_installed = 'all', highlight = {enable = true,         additional_vim_regex_highlighting = false,},}" >> ~/.config/nvim/init.lua
+           ensure_installed = {'lua','go'}, highlight = {enable = true,         additional_vim_regex_highlighting = false,},}" >> ~/.config/nvim/init.lua
     - uses: actions/checkout@v4
     - uses: actions/setup-node@v4
       with:
