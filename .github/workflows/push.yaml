@@ -1,0 +1,35 @@
+name: Merged
+on:
+  push:
+    branches:
+      - main
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Install neovim
+      run: |
+            mkdir ~/programs
+            wget https://github.com/neovim/neovim/releases/download/stable/nvim.appimage ~/programs/nvim.appimage
+            chown 0755 ~/programs/nvim.appimage
+            chmod u+x ~/programs/nvim.appimage
+            echo 'export PATH="$PATH:~/programs"'>> ~/.profile
+            source ~/.profile
+            mkdir -p ~/.config/nvim
+            touch init.lua
+    - name: Install plenary and treesitter
+      run: |
+         git clone --depth 1 https://github.com/nvim-lua/plenary.nvim \
+           "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/pack/packer/start/plenary.nvim
+         git clone --depth 1 https://github.com/nvim-treesitter/nvim-treesitter \
+           "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/pack/packer/start/nvim-treesitter
+         echo "require'nvim-treesitter.configs'.setup { \
+           ensure_installed = 'all', highlight = {enable = true,         additional_vim_regex_highlighting = false,},}" >> ~/.config/nvim/init.lua
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 20
+    - name: run tests
+      run: make tests
+
+          
