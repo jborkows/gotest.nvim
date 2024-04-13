@@ -121,6 +121,7 @@ end
 
 M.TestIdentifier = TestIdentifier
 M.ParsingResult = ParsingResult
+M.onStartingTests = state.onStartTests
 M.setup = function()
 	state.setup()
 end

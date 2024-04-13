@@ -1,6 +1,6 @@
 local M = {}
 
---- @alias State "success"|"failure"|"N/A"|"running"
+--- @alias State "success"|"failure"|"N/A"|"run"
 --- table<TestIdentifier,State>
 M.__states = {}
 --- table <TestIdentifier, string[]>
@@ -9,13 +9,45 @@ M.__test_messages = {}
 --- string[]
 M.__messages = {}
 
+---@alias StateMachine "finished"|"running"|"notstarted"
+
+---@param state State|nil
+---@return StateMachine
+local stateTranslator = function(state)
+	if state == nil then
+		return "notstarted"
+	elseif state == "success" then
+		return "finished"
+	elseif state == "failure" then
+		return "finished"
+	elseif state == "run" then
+		return "running"
+	end
+end
+---@param state State
+---@param key TestIdentifier
+local stateReactor = function(state, key)
+	local oldState = M.__states[key]
+	local machineState = stateTranslator(oldState)
+	if machineState == "notstarted" then
+		--NOP
+	elseif machineState == "finished" then
+		M.__test_messages[key] = {}
+	end
+	M.__states[key] = state
+end
+
+M.onStartTests = function()
+	M.setup()
+end
+
 ---@param message ParsingResult
 M.onParsing = function(message)
 	if message.empty then
 		return
 	end
 	if message.event ~= nil then
-		M.__states[message.event.key] = message.event.type
+		stateReactor(message.event.type, message.event.key)
 	end
 
 	if message.output ~= nil then
@@ -49,6 +81,12 @@ M.outputs = function(key)
 		return M.__test_messages[key]
 	end
 end ---comment
+
+--- all gathered entries from stdin
+---@return string[]
+M.allOutputs = function()
+	return M.__messages
+end
 
 M.setup = function()
 	M.__messages = {}
