@@ -16,5 +16,10 @@ end
 M.match = function(t1, t2)
 	return match(t1, t2) or match(t2, t1)
 end
-M.parse = parser.parse
+---comment
+---@param test_package_prefix string
+---@return Parser
+M.parser = function(prefix)
+	return parser.parser(prefix)
+end
 return M

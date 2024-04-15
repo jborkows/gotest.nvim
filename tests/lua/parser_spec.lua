@@ -34,9 +34,39 @@ Tests Failed. Exit: 1
 
 ]]
 		--- ParsingResult[]
-		local result = {}
+		local results = {}
+		local parser = luaCore.parser("xxx/projects/gotest.nvim/tests/")
 		for line in multilineText:gmatch("([^\n]+)") do
-			print(":->" .. line)
+			local parsed = parser.parse(line)
+			table.insert(results, parsed)
+		end
+
+		local expected = {
+			core.started(),
+			core.success(core.TestIdentifier:new("golang/parser_spec", "test A")),
+			core.success(core.TestIdentifier:new("golang/parser_spec", "test B")),
+			core.failure(core.TestIdentifier:new("golang/parser_spec", "test C")),
+			core.failure(core.TestIdentifier:new("state_spec", "some error")),
+			core.success(core.TestIdentifier:new("state_spec", "ok")),
+		}
+		assert(true, table.maxn(results) >= table.maxn(expected))
+
+		-- print(vim.inspect(results))
+		local parsedIndex = 1
+		for i, expect in pairs(expected) do
+			for j = parsedIndex, table.maxn(results) do
+				local parsed = results[parsedIndex].event
+				if parsed == nil then
+					--NOP
+				else
+					if parsed == expect then
+						goto finish
+					end
+
+					assert(false, "Should not come here")
+				end
+			end
+			::finish::
 		end
 	end)
 end)
