@@ -51,7 +51,6 @@ Tests Failed. Exit: 1
 		}
 		assert(true, table.maxn(results) >= table.maxn(expected))
 
-		-- print(vim.inspect(results))
 		local parsedIndex = 1
 		for i, expect in pairs(expected) do
 			for j = parsedIndex, table.maxn(results) do

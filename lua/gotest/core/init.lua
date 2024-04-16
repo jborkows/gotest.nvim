@@ -116,6 +116,13 @@ function ParsingResult:onlyEvent(event)
 	return ParsingResult:new(event, nil)
 end
 
+---comment
+---@param output Output
+---@return ParsingResult
+function ParsingResult:withOutput(output)
+	return ParsingResult:new(self.event, output)
+end
+
 ---@param output Output
 ---@return ParsingResult
 function ParsingResult:onlyOutput(output)
