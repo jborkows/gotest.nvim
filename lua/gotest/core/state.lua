@@ -72,6 +72,13 @@ M.state = function(key)
 		return "N/A"
 	end
 end
+
+---comment
+---@return table<TestIdentifier, State>
+M.states = function()
+	return M.__states
+end
+
 ---comment
 ---@param key TestIdentifier
 ---@return string[]
