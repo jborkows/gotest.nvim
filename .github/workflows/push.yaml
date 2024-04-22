@@ -10,7 +10,7 @@ jobs:
     - name: Install neovim
       run: |
             mkdir ~/programs
-            wget https://github.com/neovim/neovim/releases/download/stable/nvim.appimage -P ~/programs
+            wget https://github.com/neovim/neovim/releases/download/nightly/nvim.appimage -P ~/programs
             chmod u+x ~/programs/nvim.appimage
             echo 'export PATH="$PATH:~/programs"'>> ~/.profile
             mv ~/programs/nvim.appimage ~/programs/nvim 
@@ -20,10 +20,6 @@ jobs:
       run: |
          git clone --depth 1 https://github.com/nvim-lua/plenary.nvim \
            "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/pack/packer/start/plenary.nvim
-         git clone --depth 1 https://github.com/nvim-treesitter/nvim-treesitter \
-           "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/pack/packer/start/nvim-treesitter
-         echo "require'nvim-treesitter.configs'.setup { \
-           ensure_installed = {'lua','go'}, highlight = {enable = true,         additional_vim_regex_highlighting = false,},}" >> ~/.config/nvim/init.lua
     - uses: actions/checkout@v4
     - uses: actions/setup-node@v4
       with:
