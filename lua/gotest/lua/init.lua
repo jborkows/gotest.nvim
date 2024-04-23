@@ -85,6 +85,8 @@ local displayResults = function(states, buffers)
 	local failed = {}
 	local success = {}
 	print("1")
+	print(vim.inspect(states))
+	print(vim.inspect(buffers))
 	for key, singleState in pairs(states) do
 		print(vim.inspect(key))
 		if buffers[key.packageName] == nil then
