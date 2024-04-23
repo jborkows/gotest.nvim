@@ -53,11 +53,13 @@ M.onParsing = function(message)
 
 	if message.output ~= nil then
 		if message.output ~= nil then
-			table.insert(M.__messages, message.output.message)
-			if M.__test_messages[message.output.key] == nil then
-				M.__test_messages[message.output.key] = {}
+			if message.output.key ~= nil then
+				table.insert(M.__messages, message.output.message)
+				if M.__test_messages[message.output.key] == nil then
+					M.__test_messages[message.output.key] = {}
+				end
+				table.insert(M.__test_messages[message.output.key], message.output.message)
 			end
-			table.insert(M.__test_messages[message.output.key], message.output.message)
 		end
 	end
 end
