@@ -85,7 +85,7 @@ local displayResults = function(states, buffers)
 	local failed = {}
 	local success = {}
 	for key, singleState in pairs(states) do
-		if bufferNum[key.packageName] == nil then
+		if buffers[key.packageName] == nil then
 			goto finish
 		end
 
