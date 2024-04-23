@@ -147,7 +147,7 @@ M.setup = function()
 		callback = function()
 			local buffnr = vim.api.nvim_get_current_buf()
 			local buffor_name = vim.api.nvim_buf_get_name(buffnr)
-			if core.endsWith(buffor_name, ".spec.lua") then
+			if core.endsWith(buffor_name, "_spec.lua") then
 				local normalized_name =
 				    core.removeSuffix(core.removePrefix(core.relative(buffor_name), "/tests/"), ".lua")
 				bufferNum[normalized_name] = buffnr
