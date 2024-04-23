@@ -84,14 +84,17 @@ local group = vim.api.nvim_create_augroup("lua-live-test_au", { clear = true })
 local displayResults = function(states, buffers)
 	local failed = {}
 	local success = {}
+	print("1")
 	for key, singleState in pairs(states) do
+		print(vim.inspect(key))
 		if buffers[key.packageName] == nil then
 			goto finish
 		end
 
 		local file_buffer_no = buffers[key.packageName]
-		local found_line = M.find(file_buffer_no, key)
+		local found_line = find_test_line(file_buffer_no, key)
 		if found_line == nil then
+			print(vim.inspect(key) .. " not found")
 			goto finish
 		end
 		if singleState == "success" then
@@ -120,6 +123,7 @@ local displayResults = function(states, buffers)
 		::finish::
 	end
 
+	print("2")
 	local text = { "✔️" }
 	for buffer_no, lines in pairs(success) do
 		for _, line in ipairs(lines) do
