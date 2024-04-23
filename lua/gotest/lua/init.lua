@@ -50,8 +50,8 @@ local find_test_line = function(buffnr, key)
 	local name = key.testName
 	local formatted = string.format(test_function_query_string, name)
 	local query = vim.treesitter.query.parse("lua", formatted)
-	local parser = vim.treesitter.get_parser(buffnr, "lua", {})
-	local tree = parser:parse()[1]
+	local tsparser = vim.treesitter.get_parser(buffnr, "lua", {})
+	local tree = tsparser:parse()[1]
 	local root = tree:root()
 	for id, node in query:iter_captures(root, buffnr, 0, -1) do
 		if id == 1 then
@@ -64,9 +64,9 @@ end
 ---comment
 ---@param bufnr integer
 ---@param key TestIdentifier
----@return line integer|nil
+---@return integer|nil
 M.find = function(bufnr, key)
-	local buffor_name = vim.api.nvim_buf_get_name(0)
+	local buffor_name = vim.api.nvim_buf_get_name(bufnr)
 	local normalized_name = core.removeSuffix(core.removePrefix(core.relative(buffor_name), "/tests/"), ".lua")
 	if key.packageName ~= normalized_name then
 		return nil

@@ -20,7 +20,7 @@ M.parser = function(prefix)
 			local extracted = string.match(text, pattern)
 			if extracted ~= nil then
 				Parser.packageName = extracted
-				return core.ParsingResult.none()
+				return core.ParsingResult:none()
 			end
 
 			local pattern = "Success%s*||%s*(.*)"
@@ -39,9 +39,9 @@ M.parser = function(prefix)
 				)
 			end
 
-			return core.ParsingResult.none()
+			return core.ParsingResult:none()
 		end
-		return result().withOutput(core.output(text))
+		return result():withOutput(core.output(text))
 	end
 	return Parser
 end
