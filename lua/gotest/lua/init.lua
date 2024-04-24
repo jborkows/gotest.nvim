@@ -38,9 +38,6 @@ M.find = function(bufnr, key)
 	return query.find_test_line(bufnr, key)
 end
 
-local ns = core.marker.ns
-local group = core.marker.group
-
 local displayResults = core.marker.displayResults(query.find_test_line)
 
 local __Config = {
@@ -55,6 +52,8 @@ end
 
 -- @param ... function[]
 M.setup = function(functions)
+	local ns = core.ns
+	local group = core.group
 	for _, plugin in ipairs(functions) do
 		plugin(__Config)
 	end

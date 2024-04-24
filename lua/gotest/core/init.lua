@@ -249,12 +249,12 @@ M.setup = function(functions)
 		end
 	end
 
-	local ns = vim.api.nvim_create_namespace("lua-live-test")
-	local group = vim.api.nvim_create_augroup("lua-live-test_au", { clear = true })
+	M.ns = vim.api.nvim_create_namespace("lua-live-test")
+	M.group = vim.api.nvim_create_augroup("lua-live-test_au", { clear = true })
 	state.setup()
 	shower.setup()
 
-	marker.setup(M.myerrorhandler, M.lazyDebug, ns, group)
+	marker.setup(M.myerrorhandler, M.lazyDebug, M.ns, M.group)
 end
 
 -- @return function

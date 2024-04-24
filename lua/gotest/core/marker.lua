@@ -60,13 +60,13 @@ M.displayResults = function(find_test_line)
 		for buffer_no, lines in pairs(success) do
 			for _, line in ipairs(lines) do
 				xpcall(function()
-					vim.api.nvim_buf_set_extmark(buffer_no, M.ns, line, 0, { virt_text = { text } })
-				end, M.errorhandler)
+					vim.api.nvim_buf_set_extmark(buffer_no, M._ns, line, 0, { virt_text = { text } })
+				end, M._errorhandler)
 			end
 		end
 
 		for buffer_no, failures in pairs(failed) do
-			vim.diagnostic.set(M.ns, buffer_no, failures, {})
+			vim.diagnostic.set(M._ns, buffer_no, failures, {})
 		end
 		if table.maxn(failed) > 0 then
 			vim.notify("Test failed", vim.log.levels.ERROR)
@@ -75,8 +75,8 @@ M.displayResults = function(find_test_line)
 end
 M.setup = function(errorHandler, lazyDebug, ns, group)
 	M.lazyDebug = lazyDebug
-	M.errorHandler = errorHandler
-	M.group = group
-	M.ns = ns
+	M._errorhandler = errorHandler
+	M._group = group
+	M._ns = ns
 end
 return M
