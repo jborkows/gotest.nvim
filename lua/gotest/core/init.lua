@@ -1,4 +1,5 @@
 local state = require("gotest.core.state")
+local shower = require("gotest.core.show")
 local M = {}
 
 --- @class TestIdentifier
@@ -248,6 +249,7 @@ M.setup = function(functions)
 	end
 
 	state.setup()
+	shower.setup()
 end
 
 -- @return function
@@ -264,5 +266,12 @@ M.enableInfo =
     function(_config)
 	    _config.loggerLevel = "info"
     end
-
+---comment
+---@param lines table<string>
+M.storeTestOutputs = function(lines)
+	M.lazyDebug(function()
+		return "Received " .. vim.inspect(lines)
+	end)
+	shower.keepResult(lines)
+end
 return M

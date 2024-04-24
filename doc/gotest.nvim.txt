@@ -19,7 +19,8 @@ Sets the lua test command to given array - default {"make","tests"}
 ================================================================================
 Usage
 							     *gotest.setup()*
-Configures the pluging and register user commands. >
+Configures the pluging and register user command TestResults which shows
+latest test run in floating window. >
 
     local gotest = require('gotest.nvim')
     gotest.setup(gotest.luaTestCommand({"make","test"}), gotest.debug)

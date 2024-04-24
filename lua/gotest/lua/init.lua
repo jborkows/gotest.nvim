@@ -162,6 +162,7 @@ M.setup = function(functions)
 				end,
 				on_exit = function()
 					displayResults(state.states(), bufferNum)
+					core.storeTestOutputs(state.allOutputs())
 				end,
 			})
 		end,

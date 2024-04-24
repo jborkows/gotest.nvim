@@ -32,7 +32,7 @@ M.setup = function(...)
 	for _, plugin in ipairs({ ... }) do
 		local config = plugin()
 		if config.type == "Logging" then
-			configs = config.fn
+			table.insert(configs, config.fn)
 		end
 	end
 	require("gotest.core").setup(configs)
@@ -41,7 +41,7 @@ M.setup = function(...)
 	for _, plugin in ipairs({ ... }) do
 		local config = plugin()
 		if config.type == "Lua" then
-			configs = config.fn
+			table.insert(configs, config.fn)
 		end
 	end
 	require("gotest.lua").setup(configs)
