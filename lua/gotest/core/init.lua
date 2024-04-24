@@ -1,5 +1,6 @@
 local state = require("gotest.core.state")
 local shower = require("gotest.core.show")
+local marker = require("gotest.core.marker")
 local M = {}
 
 --- @class TestIdentifier
@@ -248,8 +249,12 @@ M.setup = function(functions)
 		end
 	end
 
+	local ns = vim.api.nvim_create_namespace("lua-live-test")
+	local group = vim.api.nvim_create_augroup("lua-live-test_au", { clear = true })
 	state.setup()
 	shower.setup()
+
+	marker.setup(M.myerrorhandler, M.lazyDebug, ns, group)
 end
 
 -- @return function
@@ -274,4 +279,5 @@ M.storeTestOutputs = function(lines)
 	end)
 	shower.keepResult(lines)
 end
+M.marker = marker
 return M

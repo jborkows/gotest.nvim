@@ -38,81 +38,10 @@ M.find = function(bufnr, key)
 	return query.find_test_line(bufnr, key)
 end
 
-local ns = vim.api.nvim_create_namespace("lua-live-test")
-local group = vim.api.nvim_create_augroup("lua-live-test_au", { clear = true })
+local ns = core.marker.ns
+local group = core.marker.group
 
----comment
----@param states table<TestIdentifier,State>
----@param buffers table<string,number>
-local displayResults = function(states, buffers)
-	local failed = {}
-	local success = {}
-	core.lazyDebug(function()
-		return "Found buffers: " .. vim.inspect(buffers)
-	end)
-	core.lazyDebug(function()
-		return "Found states: " .. vim.inspect(states)
-	end)
-	for key, singleState in pairs(states) do
-		if buffers[key.packageName] == nil then
-			goto finish
-		end
-
-		local file_buffer_no = buffers[key.packageName]
-		local found_line = query.find_test_line(file_buffer_no, key)
-
-		core.lazyDebug(function()
-			return "For " .. vim.inspect(key) .. " found line" .. found_line
-		end)
-		if found_line == nil then
-			goto finish
-		end
-		if singleState == "success" then
-			if success[file_buffer_no] == nil then
-				success[file_buffer_no] = {}
-			end
-
-			table.insert(success[file_buffer_no], found_line)
-			goto finish
-		end
-		if singleState == "failure" then
-			if failed[file_buffer_no] == nil then
-				failed[file_buffer_no] = {}
-			end
-			table.insert(failed[file_buffer_no], {
-				bufnr = file_buffer_no,
-				lnum = found_line,
-				col = 1,
-				severity = vim.diagnostic.severity.ERROR,
-				source = "testing-fun",
-				message = "Test failed",
-				user_data = {},
-			})
-			goto finish
-		end
-
-		::finish::
-	end
-
-	local text = { "✔️" }
-	core.lazyDebug(function()
-		return "Found success: " .. vim.inspect(success)
-	end)
-	for buffer_no, lines in pairs(success) do
-		for _, line in ipairs(lines) do
-			xpcall(function()
-				vim.api.nvim_buf_set_extmark(buffer_no, ns, line, 0, { virt_text = { text } })
-			end, core.myerrorhandler)
-		end
-	end
-
-	for buffer_no, failures in pairs(failed) do
-		vim.diagnostic.set(ns, buffer_no, failures, {})
-	end
-	if table.maxn(failed) > 0 then
-		vim.notify("Test failed", vim.log.levels.ERROR)
-	end
-end
+local displayResults = core.marker.displayResults(query.find_test_line)
 
 local __Config = {
 	command = { "make", "tests" },
