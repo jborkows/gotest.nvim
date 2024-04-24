@@ -130,6 +130,26 @@ M.setup = function(functions)
 		plugin(__Config)
 	end
 	local bufferNum = {}
+	vim.api.nvim_create_autocmd("BufEnter", {
+
+		group = group,
+		pattern = "*.lua",
+		callback = function()
+			local buffnr = vim.api.nvim_get_current_buf()
+			local buffor_name = vim.api.nvim_buf_get_name(buffnr)
+			local single_one = {}
+			if core.endsWith(buffor_name, "_spec.lua") then
+				local normalized_name =
+				    core.removeSuffix(core.removePrefix(core.relative(buffor_name), "/tests/"), ".lua")
+				bufferNum[normalized_name] = buffnr
+				single_one[normalized_name] = buffnr
+				vim.api.nvim_buf_clear_namespace(buffnr, ns, 0, -1)
+			end
+			local state = core.state
+
+			displayResults(state.states(), single_one)
+		end,
+	})
 	vim.api.nvim_create_autocmd("BufWritePost", {
 		group = group,
 		pattern = "*.lua",
