@@ -78,6 +78,7 @@ M.setup = function(functions)
 			displayResults(state.states(), single_one)
 		end,
 	})
+	local jobId = nil
 	vim.api.nvim_create_autocmd("BufWritePost", {
 		group = group,
 		pattern = "*.lua",
@@ -94,7 +95,10 @@ M.setup = function(functions)
 
 			local state = core.state
 			state.setup()
-			vim.fn.jobstart(__Config.command, {
+			if jobId ~= nil then
+				vim.fn.jobstop(jobId)
+			end
+			jobId = vim.fn.jobstart(__Config.command, {
 				stdout_buffered = true,
 				on_stderr = function(_, data) end,
 				on_stdout = function(_, data)
@@ -105,10 +109,12 @@ M.setup = function(functions)
 						for _, line in ipairs(data) do
 							local parsed = aParser.parse(line)
 							state.onParsing(parsed)
+							core.storeTestOutputs(state.allOutputs())
 						end
 					end, core.myerrorhandler)
 				end,
 				on_exit = function()
+					jobId = nil
 					displayResults(state.states(), bufferNum)
 					core.storeTestOutputs(state.allOutputs())
 				end,
