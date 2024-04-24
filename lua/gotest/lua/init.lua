@@ -48,6 +48,8 @@ local group = vim.api.nvim_create_augroup("lua-live-test_au", { clear = true })
 local displayResults = function(states, buffers)
 	local failed = {}
 	local success = {}
+	print(vim.inspect(buffers))
+	print(vim.inspect(states))
 	for key, singleState in pairs(states) do
 		if buffers[key.packageName] == nil then
 			goto finish
@@ -55,6 +57,8 @@ local displayResults = function(states, buffers)
 
 		local file_buffer_no = buffers[key.packageName]
 		local found_line = query.find_test_line(file_buffer_no, key)
+
+		print("For " .. vim.inspect(key) .. " found line" .. found_line)
 		if found_line == nil then
 			goto finish
 		end
@@ -73,7 +77,7 @@ local displayResults = function(states, buffers)
 			table.insert(failed[file_buffer_no], {
 				bufnr = file_buffer_no,
 				lnum = found_line,
-				col = 0,
+				col = 1,
 				severity = vim.diagnostic.severity.ERROR,
 				source = "testing-fun",
 				message = "Test failed",
@@ -86,6 +90,7 @@ local displayResults = function(states, buffers)
 	end
 
 	local text = { "✔️" }
+	print(vim.inspect(success))
 	for buffer_no, lines in pairs(success) do
 		for _, line in ipairs(lines) do
 			xpcall(function()
@@ -93,6 +98,7 @@ local displayResults = function(states, buffers)
 			end, core.myerrorhandler)
 		end
 	end
+
 	for buffer_no, failures in pairs(failed) do
 		vim.diagnostic.set(ns, buffer_no, failures, {})
 	end
@@ -118,6 +124,7 @@ M.setup = function()
 			local aParser = M.parser(core.projectPath("tests/"))
 
 			local state = core.state
+			state.setup()
 			vim.fn.jobstart(M.command, {
 				stdout_buffered = true,
 				on_stderr = function(_, data) end,

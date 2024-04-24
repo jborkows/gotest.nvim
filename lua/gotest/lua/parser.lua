@@ -16,7 +16,7 @@ M.parser = function(prefix)
 				return core.ParsingResult:onlyEvent(core.started())
 			end
 
-			local pattern = "Testing:%s*" .. prefix .. "(.*)"
+			local pattern = "Testing:%s*" .. prefix .. "(.*).lua"
 			local extracted = string.match(text, pattern)
 			if extracted ~= nil then
 				Parser.packageName = core.trim(extracted)

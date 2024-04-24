@@ -1,4 +1,5 @@
 local M = {}
+local debug = require("gotest.core").debug
 
 local test_function_query_string = [[
 (
@@ -40,7 +41,6 @@ local query = vim.treesitter.query.parse("lua", test_function_query_string)
 ---@param key TestIdentifier
 ---@return integer|nil
 M.find_test_line = function(buffnr, key)
-	local name = key.testName
 	-- local formatted = string.format(test_function_query_string, name)
 	-- local query = vim.treesitter.query.parse("lua", formatted)
 	local tsparser = vim.treesitter.get_parser(buffnr, "lua", {})

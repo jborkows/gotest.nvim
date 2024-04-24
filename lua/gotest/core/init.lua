@@ -222,6 +222,11 @@ logger.level = "debug"
 M.myerrorhandler = function(err)
 	logger.info("ERROR:" .. err)
 end
+
+M.debug = function(message)
+	logger.debug(message)
+end
+
 M.setup = function()
 	state.setup()
 end
