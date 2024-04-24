@@ -216,19 +216,53 @@ M.split = function(str, delimiter)
 	return result
 end
 
-local logger = require("plenary.log"):new()
-logger.level = "debug"
+-- @class __Config
+-- @field logerLevel string
+-- @field UserCommandName string
+local __Config = {
+	loggerLevel = "info",
+}
 
-M.myerrorhandler = function(err)
-	logger.info("ERROR:" .. err)
-end
+-- @param ... function[]
+M.setup = function(functions)
+	for _, plugin in ipairs(functions) do
+		plugin(__Config)
+	end
 
-M.debug = function(message)
-	logger.debug(message)
-end
+	local logger = require("plenary.log"):new()
 
-M.setup = function()
+	logger.level = __Config.loggerLevel
+	M.myerrorhandler = function(err)
+		logger.info("ERROR:" .. err)
+	end
+
+	M.debug = function(message)
+		logger.debug(message)
+	end
+	---comment
+	---@param fn fun(): string
+	M.lazyDebug = function(fn)
+		if logger.level == "debug" then
+			logger.debug(fn())
+		end
+	end
+
 	state.setup()
 end
+
+-- @return function
+-- @param _config __Config
+M.enableDebug =
+-- @param _config __Config
+    function(_config)
+	    _config.loggerLevel = "debug"
+    end
+-- @return function
+-- @param _config __Config
+M.enableInfo =
+-- @param _config __Config
+    function(_config)
+	    _config.loggerLevel = "info"
+    end
 
 return M

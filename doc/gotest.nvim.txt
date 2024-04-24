@@ -1,0 +1,35 @@
+================================================================================
+																 gotest.nvim
+
+This plugin enables showing short information about tests. 
+Currently supported:
+- lua tests
+
+================================================================================
+Configuration
+
+							      *gotest.debug*
+Sets logger level to debug. 
+
+							       *gotest.info*
+Sets logger level to info.
+
+							       *gotest.luaTestCommand*
+Sets the lua test command to given array - default {"make","tests"}
+================================================================================
+Usage
+							     *gotest.setup()*
+Configures the pluging and register user commands. >
+
+    local gotest = require('gotest.nvim')
+    gotest.setup(gotest.luaTestCommand({"make","test"}), gotest.debug)
+<
+
+
+
+
+
+
+
+
+vim:tw=78:ts=8:ft=help:norl:

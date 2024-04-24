@@ -37,7 +37,6 @@ M.find = function(bufnr, key)
 	end
 	return query.find_test_line(bufnr, key)
 end
-M.command = { "make", "tests" }
 
 local ns = vim.api.nvim_create_namespace("lua-live-test")
 local group = vim.api.nvim_create_augroup("lua-live-test_au", { clear = true })
@@ -48,8 +47,12 @@ local group = vim.api.nvim_create_augroup("lua-live-test_au", { clear = true })
 local displayResults = function(states, buffers)
 	local failed = {}
 	local success = {}
-	print(vim.inspect(buffers))
-	print(vim.inspect(states))
+	core.lazyDebug(function()
+		return "Found buffers: " .. vim.inspect(buffers)
+	end)
+	core.lazyDebug(function()
+		return "Found states: " .. vim.inspect(states)
+	end)
 	for key, singleState in pairs(states) do
 		if buffers[key.packageName] == nil then
 			goto finish
@@ -58,7 +61,9 @@ local displayResults = function(states, buffers)
 		local file_buffer_no = buffers[key.packageName]
 		local found_line = query.find_test_line(file_buffer_no, key)
 
-		print("For " .. vim.inspect(key) .. " found line" .. found_line)
+		core.lazyDebug(function()
+			return "For " .. vim.inspect(key) .. " found line" .. found_line
+		end)
 		if found_line == nil then
 			goto finish
 		end
@@ -90,7 +95,9 @@ local displayResults = function(states, buffers)
 	end
 
 	local text = { "✔️" }
-	print(vim.inspect(success))
+	core.lazyDebug(function()
+		return "Found success: " .. vim.inspect(success)
+	end)
 	for buffer_no, lines in pairs(success) do
 		for _, line in ipairs(lines) do
 			xpcall(function()
@@ -107,7 +114,21 @@ local displayResults = function(states, buffers)
 	end
 end
 
-M.setup = function()
+local __Config = {
+	command = { "make", "tests" },
+}
+
+M.luaTestCommand = function(cmd)
+	return function(config)
+		config.command = cmd
+	end
+end
+
+-- @param ... function[]
+M.setup = function(functions)
+	for _, plugin in ipairs(functions) do
+		plugin(__Config)
+	end
 	local bufferNum = {}
 	vim.api.nvim_create_autocmd("BufWritePost", {
 		group = group,
@@ -125,7 +146,7 @@ M.setup = function()
 
 			local state = core.state
 			state.setup()
-			vim.fn.jobstart(M.command, {
+			vim.fn.jobstart(__Config.command, {
 				stdout_buffered = true,
 				on_stderr = function(_, data) end,
 				on_stdout = function(_, data)
