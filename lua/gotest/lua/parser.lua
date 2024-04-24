@@ -4,7 +4,7 @@ local M = {}
 
 --comment
 ---@param prefix string
----@return Parser-
+---@return Parser
 M.parser = function(prefix)
 	---@class Parser
 	---@field parse fun(text:string):ParsingResult
@@ -19,24 +19,22 @@ M.parser = function(prefix)
 			local pattern = "Testing:%s*" .. prefix .. "(.*)"
 			local extracted = string.match(text, pattern)
 			if extracted ~= nil then
-				Parser.packageName = extracted
+				Parser.packageName = core.trim(extracted)
 				return core.ParsingResult:none()
 			end
 
-			local pattern = "Success%s*||%s*(.*)"
-			local extracted = string.match(text, pattern)
-			if extracted ~= nil then
-				return core.ParsingResult:onlyEvent(
-					core.success(core.TestIdentifier:new(Parser.packageName, extracted))
-				)
-			end
+			if string.find(text, "||") then
+				local splitted = core.split(text, "||")
+				local what = core.trim(splitted[2])
+				if string.find(splitted[1], "Success") then
+					return core.ParsingResult:onlyEvent(core.success(core.TestIdentifier:new(
+					Parser.packageName, what)))
+				end
 
-			local pattern = "Fail%s*||%s*(.*)"
-			local extracted = string.match(text, pattern)
-			if extracted ~= nil then
-				return core.ParsingResult:onlyEvent(
-					core.failure(core.TestIdentifier:new(Parser.packageName, extracted))
-				)
+				if string.find(splitted[1], "Fail") then
+					return core.ParsingResult:onlyEvent(core.failure(core.TestIdentifier:new(
+					Parser.packageName, what)))
+				end
 			end
 
 			return core.ParsingResult:none()

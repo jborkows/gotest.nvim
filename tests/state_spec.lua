@@ -3,7 +3,7 @@ local state = core.state
 
 local assert = require("luassert.assert")
 local key = core.TestIdentifier:new("package", "test")
-describe("state tests", function()
+describe("state", function()
 	before_each(function()
 		state.setup()
 	end)
@@ -63,7 +63,7 @@ describe("state tests", function()
 		assert.equals(2, table.maxn(state.outputs(key)))
 	end)
 
-	it("aware of starting tests", function()
+	it("aware_of_starting_tests", function()
 		state.onParsing(core.ParsingResult:onlyEvent(core.running(key)))
 		state.onParsing(core.ParsingResult:onlyEvent(core.success(key)))
 		state.onParsing(core.ParsingResult:onlyEvent(core.running(key)))

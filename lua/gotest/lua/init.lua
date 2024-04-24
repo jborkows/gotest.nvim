@@ -1,5 +1,6 @@
 local M = {}
 local parser = require("gotest.lua.parser")
+local query = require("gotest.lua.queries")
 local core = require("gotest.core")
 
 ---comment
@@ -24,43 +25,6 @@ M.parser = function(test_package_prefix)
 	return parser.parser(test_package_prefix)
 end
 
-local test_function_query_string = [[
-(
- (
-  function_call
-  name: (identifier) @_it
-  arguments: (arguments
-	       (string
-content: ((string_content) @_name))
-		)
-
-	)
-(#eq? @_it "it")
-(#eq? @_name "%s")
-
- )
-
-]]
-
----comment
----@param buffnr integer
----@param key TestIdentifier
----@return integer|nil
-local find_test_line = function(buffnr, key)
-	local name = key.testName
-	local formatted = string.format(test_function_query_string, name)
-	local query = vim.treesitter.query.parse("lua", formatted)
-	local tsparser = vim.treesitter.get_parser(buffnr, "lua", {})
-	local tree = tsparser:parse()[1]
-	local root = tree:root()
-	for id, node in query:iter_captures(root, buffnr, 0, -1) do
-		if id == 1 then
-			local range = { node:range() }
-			return range[1]
-		end
-	end
-end
-
 ---comment
 ---@param bufnr integer
 ---@param key TestIdentifier
@@ -71,7 +35,7 @@ M.find = function(bufnr, key)
 	if key.packageName ~= normalized_name then
 		return nil
 	end
-	return find_test_line(bufnr, key)
+	return query.find_test_line(bufnr, key)
 end
 M.command = { "make", "tests" }
 
@@ -84,30 +48,26 @@ local group = vim.api.nvim_create_augroup("lua-live-test_au", { clear = true })
 local displayResults = function(states, buffers)
 	local failed = {}
 	local success = {}
-	print("1")
-	print(vim.inspect(states))
-	print(vim.inspect(buffers))
 	for key, singleState in pairs(states) do
-		print(vim.inspect(key))
 		if buffers[key.packageName] == nil then
 			goto finish
 		end
 
 		local file_buffer_no = buffers[key.packageName]
-		local found_line = find_test_line(file_buffer_no, key)
+		local found_line = query.find_test_line(file_buffer_no, key)
 		if found_line == nil then
-			print(vim.inspect(key) .. " not found")
 			goto finish
 		end
 		if singleState == "success" then
-			if success[file_buffer_no] ~= nil then
+			if success[file_buffer_no] == nil then
 				success[file_buffer_no] = {}
 			end
+
 			table.insert(success[file_buffer_no], found_line)
 			goto finish
 		end
 		if singleState == "failure" then
-			if failed[file_buffer_no] ~= nil then
+			if failed[file_buffer_no] == nil then
 				failed[file_buffer_no] = {}
 			end
 			table.insert(failed[file_buffer_no], {
@@ -125,7 +85,6 @@ local displayResults = function(states, buffers)
 		::finish::
 	end
 
-	print("2")
 	local text = { "✔️" }
 	for buffer_no, lines in pairs(success) do
 		for _, line in ipairs(lines) do
@@ -136,6 +95,9 @@ local displayResults = function(states, buffers)
 	end
 	for buffer_no, failures in pairs(failed) do
 		vim.diagnostic.set(ns, buffer_no, failures, {})
+	end
+	if table.maxn(failed) > 0 then
+		vim.notify("Test failed", vim.log.levels.ERROR)
 	end
 end
 
@@ -163,10 +125,12 @@ M.setup = function()
 					if not data then
 						return
 					end -- if data are present append lines starting from end of file (-1) to end of file (-1)
-					for _, line in ipairs(data) do
-						local parsed = aParser.parse(line)
-						state.onParsing(parsed)
-					end
+					xpcall(function()
+						for _, line in ipairs(data) do
+							local parsed = aParser.parse(line)
+							state.onParsing(parsed)
+						end
+					end, core.myerrorhandler)
 				end,
 				on_exit = function()
 					displayResults(state.states(), bufferNum)
