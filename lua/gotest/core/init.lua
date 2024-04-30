@@ -240,9 +240,13 @@ M.setup = function(functions)
 		plugin(__Config)
 	end
 
-	local logger = require("plenary.log"):new()
+	local logger = require("plenary.log"):new({
+		plugin = "gotest",
+		level = __Config.loggerLevel,
+	})
+	logger.info("Hay")
+	logger.debug("Hay")
 
-	logger.level = __Config.loggerLevel
 	M.myerrorhandler = function(err)
 		logger.info("ERROR:" .. err)
 	end
