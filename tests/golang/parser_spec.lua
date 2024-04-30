@@ -1,5 +1,6 @@
 local golang = require("gotest.golang")
 local core = require("gotest.core")
+local match = require("gotest.golang.query").match
 
 describe("parsing example", function()
 	it("should parse output", function()
