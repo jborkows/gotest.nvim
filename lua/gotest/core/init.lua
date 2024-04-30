@@ -240,14 +240,18 @@ M.setup = function(functions)
 		plugin(__Config)
 	end
 
-	local logger = require("plenary.log"):new({
-		plugin = "gotest",
-		level = __Config.loggerLevel,
-		use_console = false,
-		outfile = string.format("%s/%s.log", vim.api.nvim_call_function("stdpath", { "cache" }), "gotest"),
-	})
+	local loggerPath = string.format("%s/%s.log", vim.api.nvim_call_function("stdpath", { "cache" }), "gotest")
+
+	local file = io.open(loggerPath, "a")
+	local logger = {
+		info = function(message)
+			if file ~= nil then
+				file:write("Appending this line to the file.\n")
+			end
+		end,
+	}
+
 	logger.info("Hay")
-	logger.debug("Debugging")
 
 	M.myerrorhandler = function(err)
 		logger.info("ERROR:" .. err)
