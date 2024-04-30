@@ -62,7 +62,7 @@ M.onParsing = function(message)
 			table.insert(M.__messages, message.output.message)
 			if message.output.key ~= nil then
 				if M.__test_messages[message.output.key] == nil then
-					M.__test_messages[message.output.key] = {}
+					M.__test_messages[keyInMap(message.output.key)] = {}
 				end
 				table.insert(M.__test_messages[keyInMap(message.output.key)], message.output.message)
 			end
