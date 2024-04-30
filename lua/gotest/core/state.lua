@@ -9,12 +9,6 @@ M.__test_messages = {}
 --- string[]
 M.__messages = {}
 
----@param key TestIdentifier
----@return string
-local keyInMap = function(key)
-	return string.format("%s -> %s", key.packageName, key.testName)
-end
-
 ---@alias StateMachine "finished"|"running"|"notstarted"
 
 ---@param state State|nil
@@ -33,14 +27,14 @@ end
 ---@param state State
 ---@param key TestIdentifier
 local stateReactor = function(state, key)
-	local oldState = M.__states[keyInMap(key)]
+	local oldState = M.__states[key]
 	local machineState = stateTranslator(oldState)
 	if machineState == "notstarted" then
 		--NOP
 	elseif machineState == "finished" then
-		M.__test_messages[keyInMap(key)] = {}
+		M.__test_messages[key] = {}
 	end
-	M.__states[keyInMap(key)] = state
+	M.__states[key] = state
 end
 
 ---@param message ParsingResult
@@ -61,10 +55,10 @@ M.onParsing = function(message)
 		if message.output ~= nil then
 			table.insert(M.__messages, message.output.message)
 			if message.output.key ~= nil then
-				if M.__test_messages[keyInMap(message.output.key)] == nil then
-					M.__test_messages[keyInMap(message.output.key)] = {}
+				if M.__test_messages[message.output.key] == nil then
+					M.__test_messages[message.output.key] = {}
 				end
-				table.insert(M.__test_messages[keyInMap(message.output.key)], message.output.message)
+				table.insert(M.__test_messages[message.output.key], message.output.message)
 			end
 		end
 	end
@@ -73,7 +67,7 @@ end
 ---@param key TestIdentifier
 ---@return State
 M.state = function(key)
-	local value = M.__states[keyInMap(key)]
+	local value = M.__states[key]
 	if value ~= nil then
 		return value
 	else
@@ -91,11 +85,10 @@ end
 ---@param key TestIdentifier
 ---@return string[]
 M.outputs = function(key)
-	local keyValue = keyInMap(key)
-	if M.__test_messages[keyValue] == nil then
+	if M.__test_messages[key] == nil then
 		return {}
 	else
-		return M.__test_messages[keyValue]
+		return M.__test_messages[key]
 	end
 end ---comment
 
