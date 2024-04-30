@@ -42,21 +42,21 @@ end
 -- @param ... function[]
 M.setup = function(...)
 	local configurations = {
-		core = {
+		{
 			type = "Logging",
 			setup = function()
 				return require("gotest.core").setup
 			end,
 		},
 
-		lua = {
+		{
 			type = "Lua",
 			setup = function()
 				return require("gotest.lua").setup
 			end,
 		},
 
-		go = {
+		{
 			type = "Go",
 			setup = function()
 				return require("gotest.golang").setup
@@ -74,7 +74,7 @@ M.setup = function(...)
 	-- end
 	-- configEater.setup()(configs)
 	--
-	for _, configEater in pairs(configurations) do
+	for _, configEater in ipairs(configurations) do
 		local configs = {}
 		for _, plugin in ipairs({ ... }) do
 			local config = plugin()
