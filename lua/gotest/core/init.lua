@@ -246,7 +246,16 @@ M.setup = function(functions)
 	local logger = {
 		info = function(message)
 			if file ~= nil then
-				file:write("Appending this line to the file.\n")
+				local timestamp = os.date("%Y-%m-%d %H:%M:%S")
+				file:write(string.format("[%s] %s\n", timestamp, message))
+				file:flush()
+			end
+		end,
+		debug = function(message)
+			if __Config.loggerLevel == "debug" and file ~= nil then
+				local timestamp = os.date("%Y-%m-%d %H:%M:%S")
+				file:write(string.format("[%s] %s\n", timestamp, message))
+				file:flush()
 			end
 		end,
 	}
