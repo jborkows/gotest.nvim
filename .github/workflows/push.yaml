@@ -23,8 +23,9 @@ jobs:
       run: |
          git clone --depth 1 https://github.com/nvim-lua/plenary.nvim \
            "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/pack/packer/start/plenary.nvim
-
-         ~/programs/nvim --headless -c 'TSInstall go' -c 'qa'
+         git clone --depth 1 https://github.com/nvim-treesitter/nvim-treesitter \
+           "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/pack/packer/start/nvim-tressitter
+         ~/programs/nvim --headless -c 'lua  require"nvim-treesitter.configs".setup {ensure_installed = { "c", "lua", "vim", "vimdoc", "query", "go" },sync_install = true}' -c qa
          sleep 30
     - uses: actions/checkout@v4
     - uses: actions/setup-node@v4
