@@ -39,11 +39,11 @@ M.find_test_line = function(buffnr, key)
 	local tree = tsparser:parse()[1]
 	local root = tree:root()
 
-	for _, match, metadata in query:iter_matches(root, buffnr) do
+	for _, found, metadata in query:iter_matches(root, buffnr) do
 		local name = ""
 		local packageName = ""
 		local nodeFound = nil
-		for id, node in pairs(match) do
+		for id, node in pairs(found) do
 			local capture_name = query.captures[id] -- Get the capture name
 			if capture_name == "_name" then -- Check if this is the capture we're interested in
 				name = vim.treesitter.get_node_text(node, buffnr)

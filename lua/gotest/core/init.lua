@@ -333,6 +333,7 @@ M.initializeMarker = function(setupConfig)
 			if jobId ~= nil then
 				vim.fn.jobstop(jobId)
 			end
+			M.debug("Running command: " .. vim.inspect(setupConfig.testCommand))
 			jobId = vim.fn.jobstart(setupConfig.testCommand, {
 				stdout_buffered = true,
 				on_stderr = function(_, _) end,
