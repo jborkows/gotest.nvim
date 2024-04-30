@@ -65,7 +65,7 @@ M.setup = function(...)
 	local configs = {}
 	local configEater = configurations.core
 	for _, plugin in ipairs({ ... }) do
-		local config = plugin()
+		local config = plugin
 		if config.type == configEater.type then
 			table.insert(configs, config.fn)
 		end
@@ -75,7 +75,7 @@ M.setup = function(...)
 	for key, configEater in pairs(configurations) do
 		local configs = {}
 		for _, plugin in ipairs({ ... }) do
-			local config = plugin()
+			local config = plugin
 			if config.type == configEater.type then
 				table.insert(configs, config.fn)
 			end
