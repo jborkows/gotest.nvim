@@ -1,6 +1,3 @@
-call plug#begin('~/.local/share/nvim/plugged')
-Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
-call plug#end()
 lua << EOF
 require'nvim-treesitter.install'.compilers = { "gcc" }
 require'nvim-treesitter.configs'.setup {
