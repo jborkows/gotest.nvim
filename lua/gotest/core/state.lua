@@ -24,17 +24,31 @@ local stateTranslator = function(state)
 		return "running"
 	end
 end
+
+---@param key TestIdentifier
+---@return string
+local asKey = function(key)
+	return key.testName .. " " .. key.packageName
+end
+
 ---@param state State
 ---@param key TestIdentifier
 local stateReactor = function(state, key)
-	local oldState = M.__states[key]
-	local machineState = stateTranslator(oldState)
+	local oldState = M.__states[asKey(key)]
+	local oldStateValue = nil
+	if oldState ~= nil then
+		oldStateValue = oldState.state
+	end
+	local machineState = stateTranslator(oldStateValue)
 	if machineState == "notstarted" then
 		--NOP
 	elseif machineState == "finished" then
 		M.__test_messages[key] = {}
 	end
-	M.__states[key] = state
+	M.__states[asKey(key)] = {
+		state = state,
+		key = key,
+	}
 end
 
 ---@param message ParsingResult
@@ -67,9 +81,9 @@ end
 ---@param key TestIdentifier
 ---@return State
 M.state = function(key)
-	local value = M.__states[key]
+	local value = M.__states[asKey(key)]
 	if value ~= nil then
-		return value
+		return value.state
 	else
 		return "N/A"
 	end
@@ -78,7 +92,11 @@ end
 ---comment
 ---@return table<TestIdentifier, State>
 M.states = function()
-	return M.__states
+	local result = {}
+	for _, value in pairs(M.__states) do
+		result[value.key] = value.state
+	end
+	return result
 end
 
 ---comment

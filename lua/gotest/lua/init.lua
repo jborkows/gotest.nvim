@@ -56,7 +56,7 @@ M.setup = function(functions)
 
 	core.initializeMarker({
 		pattern = "*.lua",
-		bufforNameProcessor = function(buffor_name)
+		bufforNameProcessor = function(buffor_name, _)
 			if not core.endsWith(buffor_name, "_spec.lua") then
 				return nil
 			end

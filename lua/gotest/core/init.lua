@@ -328,7 +328,7 @@ M.marker = marker
 ---@class SetupConfig
 ---@field pattern string
 ---@field testCommand table<string>
----@field bufforNameProcessor fun(text:string):string|nil
+---@field bufforNameProcessor fun(text:string, buffnr:integer):string|nil
 ---@field findTestLine fun(buffnr:integer, key:TestIdentifier):integer|nil
 ---@field parserProvider fun(): Parser
 
@@ -348,7 +348,7 @@ M.initializeMarker = function(setupConfig)
 			local buffnr = vim.api.nvim_get_current_buf()
 			local buffor_name = vim.api.nvim_buf_get_name(buffnr)
 			local single_one = {}
-			local normalized_name = setupConfig.bufforNameProcessor(buffor_name)
+			local normalized_name = setupConfig.bufforNameProcessor(buffor_name, 0)
 			if normalized_name ~= nil then
 				bufferNum[normalized_name] = buffnr
 				single_one[normalized_name] = buffnr
@@ -365,7 +365,7 @@ M.initializeMarker = function(setupConfig)
 			local buffnr = vim.api.nvim_get_current_buf()
 			local buffor_name = vim.api.nvim_buf_get_name(buffnr)
 
-			local normalized_name = setupConfig.bufforNameProcessor(buffor_name)
+			local normalized_name = setupConfig.bufforNameProcessor(buffor_name, 0)
 			if normalized_name ~= nil then
 				bufferNum[normalized_name] = buffnr
 				vim.api.nvim_buf_clear_namespace(buffnr, ns, 0, -1)

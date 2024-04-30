@@ -14,6 +14,18 @@ local test_function_query_string = [[
 
 ]]
 
+local test_function_package_query = [[
+(
+  (package_clause
+    ((package_identifier) @_package))
+  (function_declaration
+    name: ((identifier) @_name)
+    )
+(#match? @_name "Test" )
+)
+
+]]
+
 ---@param t1 TestIdentifier
 ---@param t2 TestIdentifier
 ---@return boolean
@@ -30,6 +42,7 @@ M.match = function(t1, t2)
 end
 
 local query = nil
+local packageQuery = nil
 ---comment
 ---@param buffnr integer
 ---@param key TestIdentifier
@@ -62,4 +75,35 @@ M.find_test_line = function(buffnr, key)
 		end
 	end
 end
+
+---@param buffnr integer
+---@return string|nil
+M.package_name_query = function(buffnr)
+	if query == nil then
+		query = vim.treesitter.query.parse("go", test_function_query_string)
+	end
+	local tsparser = vim.treesitter.get_parser(buffnr, "go", {})
+	local tree = tsparser:parse()[1]
+	local root = tree:root()
+
+	for _, found, metadata in query:iter_matches(root, buffnr) do
+		local name = ""
+		local packageName = ""
+		local nodeFound = nil
+		for id, node in pairs(found) do
+			local capture_name = query.captures[id] -- Get the capture name
+			if capture_name == "_name" then -- Check if this is the capture we're interested in
+				name = vim.treesitter.get_node_text(node, buffnr)
+				nodeFound = node
+			end
+			if capture_name == "_package" then
+				packageName = vim.treesitter.get_node_text(node, buffnr)
+			end
+		end
+		if nodeFound ~= nil and core.startsWith(name, "Test") then
+			return packageName
+		end
+	end
+end
+
 return M

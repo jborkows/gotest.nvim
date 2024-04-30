@@ -28,8 +28,8 @@ M.setup = function(functions)
 
 	core.initializeMarker({
 		pattern = "*.go",
-		bufforNameProcessor = function(buffor_name)
-			return buffor_name
+		bufforNameProcessor = function(buffor_name, buffor_number)
+			return query.package_name_query(buffor_number) or buffor_name
 		end,
 		parserProvider = function()
 			return parser

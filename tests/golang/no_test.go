@@ -1,0 +1,4 @@
+package apackage
+
+func foo() {
+}

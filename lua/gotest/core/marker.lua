@@ -1,4 +1,21 @@
 local M = {}
+
+---@param find_test_line fun( buffers:table<string,number>,key: TestIdentifier):integer|nil
+---@return integer|nil
+local find_buffer = function(buffers, key)
+	if buffers[key.packageName] ~= nil then
+		return buffers[key.packageName]
+	end
+	for name, value in pairs(buffers) do
+		if string.match(name, key.packageName) then
+			return value
+		end
+		if string.match(key.packageName, name) then
+			return value
+		end
+	end
+end
+
 ---comment
 ---@param find_test_line fun(bufnr:number,key: TestIdentifier):integer|nil
 ---@return fun(states:table<TestIdentifier,State>,buffers:table<string,number>)
@@ -13,11 +30,11 @@ M.displayResults = function(find_test_line)
 			return "Found states: " .. vim.inspect(states)
 		end)
 		for key, singleState in pairs(states) do
-			if buffers[key.packageName] == nil then
+			local file_buffer_no = find_buffer(buffers, key)
+			if file_buffer_no == nil then
 				goto finish
 			end
 
-			local file_buffer_no = buffers[key.packageName]
 			local found_line = find_test_line(file_buffer_no, key)
 
 			M.lazyDebug(function()
