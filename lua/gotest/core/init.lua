@@ -345,7 +345,9 @@ M.initializeMarker = function(setupConfig)
 			M.debug("Running command: " .. vim.inspect(setupConfig.testCommand))
 			jobId = vim.fn.jobstart(setupConfig.testCommand, {
 				stdout_buffered = true,
-				on_stderr = function(_, _) end,
+				on_stderr = function(_, data)
+					M.debug("Error stream: " .. vim.inspect(data))
+				end,
 				on_stdout = function(_, data)
 					if not data then
 						return
