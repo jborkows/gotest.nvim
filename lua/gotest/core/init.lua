@@ -110,7 +110,14 @@ ParsingResult.__index = ParsingResult
 ---@param output Output|nil
 ---@return ParsingResult
 function ParsingResult:new(event, output)
-	local obj = setmetatable({ output = output, event = event }, ParsingResult)
+	local obj = setmetatable({}, ParsingResult)
+	obj.output = output
+	obj.event = event
+	if M.lazyDebug then
+		M.lazyDebug(function()
+			return vim.inspect(event or "")
+		end)
+	end
 	obj.empty = false
 	return obj
 end
