@@ -242,20 +242,23 @@ M.setup = function(functions)
 
 	local loggerPath = string.format("%s/%s.log", vim.api.nvim_call_function("stdpath", { "cache" }), "gotest")
 
-	local file = io.open(loggerPath, "a")
+	function writeMessage(message)
+		local file = io.open(loggerPath, "a")
+
+		if file ~= nil then
+			local timestamp = os.date("%Y-%m-%d %H:%M:%S")
+			file:write(string.format("[%s] %s: %s\n", timestamp, vim.api.nvim_buf_get_name(0), message))
+			file:flush()
+		end
+	end
+
 	local logger = {
 		info = function(message)
-			if file ~= nil then
-				local timestamp = os.date("%Y-%m-%d %H:%M:%S")
-				file:write(string.format("[%s] %s\n", timestamp, message))
-				file:flush()
-			end
+			writeMessage(message)
 		end,
 		debug = function(message)
-			if __Config.loggerLevel == "debug" and file ~= nil then
-				local timestamp = os.date("%Y-%m-%d %H:%M:%S")
-				file:write(string.format("[%s] %s\n", timestamp, message))
-				file:flush()
+			if __Config.loggerLevel == "debug" then
+				writeMessage(message)
 			end
 		end,
 	}
