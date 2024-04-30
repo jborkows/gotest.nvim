@@ -311,7 +311,7 @@ M.initializeMarker = function(setupConfig)
 				single_one[normalized_name] = buffnr
 				vim.api.nvim_buf_clear_namespace(buffnr, ns, 0, -1)
 			end
-			M._displayResults(state.states(), single_one)
+			displayResults(state.states(), single_one)
 		end,
 	})
 	local jobId = nil
@@ -350,7 +350,7 @@ M.initializeMarker = function(setupConfig)
 				end,
 				on_exit = function()
 					jobId = nil
-					M._displayResults(state.states(), bufferNum)
+					displayResults(state.states(), bufferNum)
 					M.storeTestOutputs(state.allOutputs())
 				end,
 			})
