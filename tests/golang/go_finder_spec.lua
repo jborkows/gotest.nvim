@@ -1,0 +1,22 @@
+local golang = require("gotest.golang.query")
+local core = require("gotest.core")
+
+describe("parsing example", function()
+	it("test found case", function()
+		vim.cmd("e tests/golang/example.go")
+		local testA = golang.find_test_line(0, core.TestIdentifier:new("internal/apackage", "TestA"))
+		assert(testA == 6, "Should found test A")
+	end)
+
+	it("test found second case", function()
+		vim.cmd("e tests/golang/example.go")
+		local testB = golang.find_test_line(0, core.TestIdentifier:new("apackage", "TestB"))
+		assert(testB == 9, "Should found test B")
+	end)
+
+	it("should not found random test", function()
+		vim.cmd("e tests/golang/example.go")
+		local testC = golang.find_test_line(0, core.TestIdentifier:new("apackage", "TestC"))
+		assert(testC == nil, "Should not found test C")
+	end)
+end)

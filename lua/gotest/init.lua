@@ -1,6 +1,7 @@
 local M = {}
 local core = require("gotest.core")
 local luaCore = require("gotest.lua")
+local golangCore = require("gotest.golang")
 
 M.debug = function()
 	return {
@@ -26,24 +27,50 @@ M.luaTestCommand = function(cmd)
 	}
 end
 
+---comment
+---@param cmd table<string>
+---@return table
+M.goTestCommand = function(cmd)
+	return {
+		type = "Go",
+		fn = golangCore.TestCommand(cmd),
+	}
+end
+
 -- @param ... function[]
 M.setup = function(...)
-	local configs = {}
-	for _, plugin in ipairs({ ... }) do
-		local config = plugin()
-		if config.type == "Logging" then
-			table.insert(configs, config.fn)
-		end
-	end
-	require("gotest.core").setup(configs)
+	local configurations = {
+		core = {
+			type = "Logging",
+			setup = function()
+				return require("gotest.core").setup
+			end,
+		},
 
-	configs = {}
-	for _, plugin in ipairs({ ... }) do
-		local config = plugin()
-		if config.type == "Lua" then
-			table.insert(configs, config.fn)
+		lua = {
+			type = "Lua",
+			setup = function()
+				return require("gotest.lua").setup
+			end,
+		},
+
+		go = {
+			type = "Go",
+			setup = function()
+				return require("gotest.golang").setup
+			end,
+		},
+	}
+
+	for _, configEater in pairs(configurations) do
+		local configs = {}
+		for _, plugin in ipairs({ ... }) do
+			local config = plugin()
+			if config.type == configEater.type then
+				table.insert(configs, config.fn)
+			end
 		end
+		configEater.setup()(configs)
 	end
-	require("gotest.lua").setup(configs)
 end
 return M
