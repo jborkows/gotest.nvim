@@ -168,6 +168,15 @@ end
 
 ---comment
 ---@param str string
+---@param prefix string
+---@return boolean
+M.startsWith = function(str, prefix)
+	local prefixStart, prefixEnd = string.find(str, prefix)
+	return prefixStart == 1 -- Ensure the prefix is at the start
+end
+
+---comment
+---@param str string
 ---@param suffix string
 ---@return string
 M.removeSuffix = function(str, suffix)

@@ -5,6 +5,9 @@ local core = require("gotest.core")
 ---@param text string
 ---@return ParsingResult
 M.parse = function(text)
+	if not core.startsWith(text, "{") then
+		return core.ParsingResult:none()
+	end
 	local json = vim.fn.json_decode(text)
 
 	if not vim.tbl_contains({ "output", "fail", "run", "pass" }, json.Action) then
