@@ -24,7 +24,7 @@ jobs:
          git clone --depth 1 https://github.com/nvim-lua/plenary.nvim \
            "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/pack/packer/start/plenary.nvim
 
-         ~/programs/nvim --headless -c 'TsInstall go' -c 'qa'
+         ~/programs/nvim --headless -c 'TSInstall go' -c 'qa'
          sleep 30
     - uses: actions/checkout@v4
     - uses: actions/setup-node@v4
