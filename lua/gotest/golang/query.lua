@@ -29,12 +29,15 @@ M.match = function(t1, t2)
 	return match(t1, t2) or match(t2, t1)
 end
 
-local query = vim.treesitter.query.parse("go", test_function_query_string)
+local query = nil
 ---comment
 ---@param buffnr integer
 ---@param key TestIdentifier
 ---@return integer|nil
 M.find_test_line = function(buffnr, key)
+	if query == nil then
+		query = vim.treesitter.query.parse("go", test_function_query_string)
+	end
 	local tsparser = vim.treesitter.get_parser(buffnr, "go", {})
 	local tree = tsparser:parse()[1]
 	local root = tree:root()
