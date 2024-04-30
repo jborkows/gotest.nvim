@@ -243,22 +243,25 @@ M.setup = function(functions)
 	local logger = require("plenary.log"):new({
 		plugin = "gotest",
 		level = __Config.loggerLevel,
+		use_console = false,
 	})
 	logger.info("Hay")
-	logger.debug("Hay")
+	logger.debug("Debugging")
 
 	M.myerrorhandler = function(err)
 		logger.info("ERROR:" .. err)
 	end
 
 	M.debug = function(message)
-		logger.debug(message)
+		if __Config.loggerLevel == "debug" then
+			logger.debug(message)
+		end
 	end
 	---comment
 	---@param fn fun(): string
 	M.lazyDebug = function(fn)
-		if logger.level == "debug" then
-			logger.debug(fn())
+		if __Config.loggerLevel == "debug" then
+			logger.info(fn())
 		end
 	end
 
