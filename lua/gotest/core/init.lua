@@ -13,7 +13,10 @@ TestIdentifier.__index = TestIdentifier
 ---@param testName string
 ---@return TestIdentifier
 function TestIdentifier:new(packageName, testName)
-	return setmetatable({ packageName = packageName, testName = testName }, TestIdentifier)
+	local a = setmetatable({}, TestIdentifier)
+	a.testName = testName
+	a.packageName = packageName
+	return a
 end
 
 ---comment
