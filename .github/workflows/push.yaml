@@ -15,11 +15,9 @@ jobs:
             echo 'export PATH="$PATH:~/programs"'>> ~/.profile
             mv ~/programs/nvim.appimage ~/programs/nvim 
             mkdir -p ~/.config/nvim
-            touch init.lua
-    - name: Install plenary and treesitter
+    - name: Use kickstart
       run: |
-         git clone --depth 1 https://github.com/nvim-lua/plenary.nvim \
-           "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/pack/packer/start/plenary.nvim
+             git clone https://github.com/nvim-lua/kickstart.nvim.git ~/.config/nvim
     - uses: actions/checkout@v4
     - uses: actions/setup-node@v4
       with:
