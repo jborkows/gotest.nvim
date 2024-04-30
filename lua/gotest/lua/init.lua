@@ -38,8 +38,6 @@ M.find = function(bufnr, key)
 	return query.find_test_line(bufnr, key)
 end
 
-local displayResults = core.marker.displayResults(query.find_test_line)
-
 local __Config = {
 	command = { "make", "tests" },
 }
@@ -52,74 +50,26 @@ end
 
 -- @param ... function[]
 M.setup = function(functions)
-	local ns = core.ns
-	local group = core.group
 	for _, plugin in ipairs(functions) do
 		plugin(__Config)
 	end
-	local bufferNum = {}
-	vim.api.nvim_create_autocmd("BufEnter", {
 
-		group = group,
+	core.initializeMarker({
 		pattern = "*.lua",
-		callback = function()
-			local buffnr = vim.api.nvim_get_current_buf()
-			local buffor_name = vim.api.nvim_buf_get_name(buffnr)
-			local single_one = {}
-			if core.endsWith(buffor_name, "_spec.lua") then
-				local normalized_name =
-				    core.removeSuffix(core.removePrefix(core.relative(buffor_name), "/tests/"), ".lua")
-				bufferNum[normalized_name] = buffnr
-				single_one[normalized_name] = buffnr
-				vim.api.nvim_buf_clear_namespace(buffnr, ns, 0, -1)
+		bufforNameProcessor = function(buffor_name)
+			if not core.endsWith(buffor_name, "_spec.lua") then
+				return nil
 			end
-			local state = core.state
 
-			displayResults(state.states(), single_one)
+			local normalized_name = core.removeSuffix(
+			core.removePrefix(core.relative(buffor_name), "/tests/"), ".lua")
+			return normalized_name
 		end,
-	})
-	local jobId = nil
-	vim.api.nvim_create_autocmd("BufWritePost", {
-		group = group,
-		pattern = "*.lua",
-		callback = function()
-			local buffnr = vim.api.nvim_get_current_buf()
-			local buffor_name = vim.api.nvim_buf_get_name(buffnr)
-			if core.endsWith(buffor_name, "_spec.lua") then
-				local normalized_name =
-				    core.removeSuffix(core.removePrefix(core.relative(buffor_name), "/tests/"), ".lua")
-				bufferNum[normalized_name] = buffnr
-				vim.api.nvim_buf_clear_namespace(buffnr, ns, 0, -1)
-			end
-			local aParser = M.parser(core.projectPath("tests/"))
-
-			local state = core.state
-			state.setup()
-			if jobId ~= nil then
-				vim.fn.jobstop(jobId)
-			end
-			jobId = vim.fn.jobstart(__Config.command, {
-				stdout_buffered = true,
-				on_stderr = function(_, data) end,
-				on_stdout = function(_, data)
-					if not data then
-						return
-					end -- if data are present append lines starting from end of file (-1) to end of file (-1)
-					xpcall(function()
-						for _, line in ipairs(data) do
-							local parsed = aParser.parse(line)
-							state.onParsing(parsed)
-							core.storeTestOutputs(state.allOutputs())
-						end
-					end, core.myerrorhandler)
-				end,
-				on_exit = function()
-					jobId = nil
-					displayResults(state.states(), bufferNum)
-					core.storeTestOutputs(state.allOutputs())
-				end,
-			})
+		parserProvider = function()
+			return M.parser(core.projectPath("tests/"))
 		end,
+		testCommand = __Config.command,
+		findTestLine = query.find_test_line,
 	})
 end
 

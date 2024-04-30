@@ -249,12 +249,12 @@ M.setup = function(functions)
 		end
 	end
 
-	M.ns = vim.api.nvim_create_namespace("lua-live-test")
-	M.group = vim.api.nvim_create_augroup("lua-live-test_au", { clear = true })
+	M._ns = vim.api.nvim_create_namespace("lua-live-test")
+	M._group = vim.api.nvim_create_augroup("lua-live-test_au", { clear = true })
 	state.setup()
 	shower.setup()
 
-	marker.setup(M.myerrorhandler, M.lazyDebug, M.ns, M.group)
+	marker.setup(M.myerrorhandler, M.lazyDebug, M._ns, M._group)
 end
 
 -- @return function
@@ -279,5 +279,83 @@ M.storeTestOutputs = function(lines)
 	end)
 	shower.keepResult(lines)
 end
+
 M.marker = marker
+
+---@class SetupConfig
+---@field pattern string
+---@field testCommand table<string>
+---@field bufforNameProcessor fun(text:string):string|nil
+---@field findTestLine fun(buffnr:integer, key:TestIdentifier):integer|nil
+---@field parserProvider fun(): Parser
+
+---Initialize package autocommands
+---@param setupConfig SetupConfig
+M.initializeMarker = function(setupConfig)
+	local ns = M._ns
+	local group = M._group
+
+	local displayResults = M.marker.displayResults(setupConfig.findTestLine)
+	local bufferNum = {}
+	vim.api.nvim_create_autocmd("BufEnter", {
+
+		group = group,
+		pattern = setupConfig.pattern,
+		callback = function()
+			local buffnr = vim.api.nvim_get_current_buf()
+			local buffor_name = vim.api.nvim_buf_get_name(buffnr)
+			local single_one = {}
+			local normalized_name = setupConfig.bufforNameProcessor(buffor_name)
+			if normalized_name ~= nil then
+				bufferNum[normalized_name] = buffnr
+				single_one[normalized_name] = buffnr
+				vim.api.nvim_buf_clear_namespace(buffnr, ns, 0, -1)
+			end
+			M._displayResults(state.states(), single_one)
+		end,
+	})
+	local jobId = nil
+	vim.api.nvim_create_autocmd("BufWritePost", {
+		group = group,
+		pattern = setupConfig.pattern,
+		callback = function()
+			local buffnr = vim.api.nvim_get_current_buf()
+			local buffor_name = vim.api.nvim_buf_get_name(buffnr)
+
+			local normalized_name = setupConfig.bufforNameProcessor(buffor_name)
+			if normalized_name ~= nil then
+				bufferNum[normalized_name] = buffnr
+				vim.api.nvim_buf_clear_namespace(buffnr, ns, 0, -1)
+			end
+			local aParser = setupConfig.parserProvider()
+
+			state.setup()
+			if jobId ~= nil then
+				vim.fn.jobstop(jobId)
+			end
+			jobId = vim.fn.jobstart(setupConfig.testCommand, {
+				stdout_buffered = true,
+				on_stderr = function(_, _) end,
+				on_stdout = function(_, data)
+					if not data then
+						return
+					end -- if data are present append lines starting from end of file (-1) to end of file (-1)
+					xpcall(function()
+						for _, line in ipairs(data) do
+							local parsed = aParser.parse(line)
+							state.onParsing(parsed)
+							M.storeTestOutputs(state.allOutputs())
+						end
+					end, M.myerrorhandler)
+				end,
+				on_exit = function()
+					jobId = nil
+					M._displayResults(state.states(), bufferNum)
+					M.storeTestOutputs(state.allOutputs())
+				end,
+			})
+		end,
+	})
+end
+
 return M
