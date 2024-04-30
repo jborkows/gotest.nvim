@@ -244,6 +244,7 @@ M.setup = function(functions)
 		plugin = "gotest",
 		level = __Config.loggerLevel,
 		use_console = false,
+		outfile = string.format("%s/%s.log", vim.api.nvim_call_function("stdpath", { "cache" }), "gotest"),
 	})
 	logger.info("Hay")
 	logger.debug("Debugging")
