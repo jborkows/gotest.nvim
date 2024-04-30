@@ -7,14 +7,6 @@ local query = require("gotest.golang.query")
 ---@param t1 TestIdentifier
 ---@param t2 TestIdentifier
 ---@return boolean
-function match(t1, t2)
-	return t1.testName == t2.testName and string.match(t1.packageName, t2.packageName .. "$") ~= nil
-end
-
----comment
----@param t1 TestIdentifier
----@param t2 TestIdentifier
----@return boolean
 M.match = query.match
 
 local __Config = {
@@ -34,7 +26,7 @@ M.setup = function(functions)
 	end
 
 	core.initializeMarker({
-		pattern = "*.lua",
+		pattern = "*.go",
 		bufforNameProcessor = function(buffor_name)
 			return buffor_name
 		end,
