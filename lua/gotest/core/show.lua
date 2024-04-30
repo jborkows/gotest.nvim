@@ -26,7 +26,11 @@ M._show = function()
 	}
 	local lines = {}
 	if table.maxn(M._lines) > 0 then
-		lines = M._lines
+		for _, value in pairs(M._lines) do
+			for line in string.gmatch(value, "([^\n]+)") do
+				table.insert(lines, line)
+			end
+		end
 	else
 		lines = { "No test data available 😔" }
 	end
