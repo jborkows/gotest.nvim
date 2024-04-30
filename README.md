@@ -3,6 +3,7 @@ Attach command on save which runs the tests in command line. It tries marking al
 
 ## Currently supported:
 - lua
+- go (currently test method should start with prefix "Test")
 
 
 ## User commands:
