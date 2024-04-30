@@ -64,17 +64,17 @@ M.setup = function(...)
 		},
 	}
 
-	local configs = {}
-	local configEater = configurations.core
-	for _, plugin in ipairs({ ... }) do
-		local config = plugin()
-		if config.type == configEater.type then
-			table.insert(configs, config.fn)
-		end
-	end
-	configEater.setup()(configs)
-
-	for key, configEater in pairs(configurations) do
+	-- local configs = {}
+	-- local configEater = configurations.core
+	-- for _, plugin in ipairs({ ... }) do
+	-- 	local config = plugin()
+	-- 	if config.type == configEater.type then
+	-- 		table.insert(configs, config.fn)
+	-- 	end
+	-- end
+	-- configEater.setup()(configs)
+	--
+	for _, configEater in pairs(configurations) do
 		local configs = {}
 		for _, plugin in ipairs({ ... }) do
 			local config = plugin()
