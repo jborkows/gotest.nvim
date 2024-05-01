@@ -4,12 +4,11 @@ local M = {}
 
 --comment
 ---@param prefix string
----@return Parser
+---@return TestOutputParser
 M.parser = function(prefix)
-	---@class Parser
-	---@field parse fun(text:string):ParsingResult
+	---@type TestOutputParser
 	local Parser = {}
-	Parser.packageName = ""
+	local packageName = ""
 	Parser.parse = function(text)
 		local result = function()
 			if string.match(text, "Starting") then
@@ -19,7 +18,7 @@ M.parser = function(prefix)
 			local pattern = "Testing:%s*" .. prefix .. "(.*).lua"
 			local extracted = string.match(text, pattern)
 			if extracted ~= nil then
-				Parser.packageName = core.trim(extracted)
+				packageName = core.trim(extracted)
 				return core.ParsingResult:none()
 			end
 
@@ -28,12 +27,12 @@ M.parser = function(prefix)
 				local what = core.trim(splitted[2])
 				if string.find(splitted[1], "Success") then
 					return core.ParsingResult:onlyEvent(core.success(core.TestIdentifier:new(
-					Parser.packageName, what)))
+					packageName, what)))
 				end
 
 				if string.find(splitted[1], "Fail") then
 					return core.ParsingResult:onlyEvent(core.failure(core.TestIdentifier:new(
-					Parser.packageName, what)))
+					packageName, what)))
 				end
 			end
 

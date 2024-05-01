@@ -96,12 +96,15 @@ end
 
 M.marker = marker
 
+---@class TestOutputParser
+---@field parse fun(text:string):ParsingResult
+
 ---@class SetupConfig
 ---@field pattern string
 ---@field testCommand table<string>
 ---@field bufforNameProcessor fun(text:string, buffnr:integer):string|nil
 ---@field findTestLine fun(buffnr:integer, key:TestIdentifier):integer|nil
----@field parserProvider fun(): Parser
+---@field parserProvider fun():  TestOutputParser
 
 ---Initialize package autocommands
 ---@param setupConfig SetupConfig
