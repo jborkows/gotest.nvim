@@ -335,11 +335,15 @@ M.initializeMarker = function(setupConfig)
 			if jobId ~= nil then
 				vim.fn.jobstop(jobId)
 			end
-			M.debug("Running command: " .. vim.inspect(setupConfig.testCommand))
+			lazyDebug(function()
+				return "Running command: " .. vim.inspect(setupConfig.testCommand)
+			end)
 			jobId = vim.fn.jobstart(setupConfig.testCommand, {
 				stdout_buffered = true,
 				on_stderr = function(_, data)
-					M.debug("Error stream: " .. vim.inspect(data))
+					lazyDebug(function()
+						return "Error stream: " .. vim.inspect(data)
+					end)
 				end,
 				on_stdout = function(_, data)
 					if not data then

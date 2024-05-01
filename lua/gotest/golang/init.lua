@@ -15,7 +15,6 @@ local __Config = {
 
 M.TestCommand = function(cmd)
 	return function(config)
-		core.debug("Will use " .. vim.inspect(cmd) .. " for go")
 		config.command = cmd
 	end
 end

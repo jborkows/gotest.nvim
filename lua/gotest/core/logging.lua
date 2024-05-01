@@ -7,14 +7,15 @@ local loggerPath = string.format("%s/%s.log", vim.api.nvim_call_function("stdpat
 local function writeMessage(message, logLevel)
 	local file = io.open(loggerPath, "a")
 
-	if file ~= nil then
-		local timestamp = os.date("%Y-%m-%d %H:%M:%S")
-		file:write(
-			string.format("[%s][%s] %s: %s\n", string.upper(logLevel), timestamp,
-				vim.api.nvim_buf_get_name(0), message)
-		)
-		file:flush()
+	if file == nil then
+		return
 	end
+	local timestamp = os.date("%Y-%m-%d %H:%M:%S")
+	file:write(
+		string.format("[%s][%s] %s: %s\n", string.upper(logLevel), timestamp, vim.api.nvim_buf_get_name(0),
+			message)
+	)
+	file:flush()
 end
 
 local logger = {
