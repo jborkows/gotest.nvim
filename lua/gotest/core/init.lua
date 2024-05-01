@@ -1,6 +1,8 @@
 local state = require("gotest.core.state")
 local shower = require("gotest.core.show")
 local marker = require("gotest.core.marker")
+local loggerModule = require("gotest.core.logging")
+local lazyDebug = loggerModule.lazyDebug
 local M = {}
 
 --- @class TestIdentifier
@@ -113,11 +115,9 @@ function ParsingResult:new(event, output)
 	local obj = setmetatable({}, ParsingResult)
 	obj.output = output
 	obj.event = event
-	if M.lazyDebug then
-		M.lazyDebug(function()
-			return vim.inspect(event or "")
-		end)
-	end
+	lazyDebug(function()
+		return vim.inspect(event or "")
+	end)
 	obj.empty = false
 	return obj
 end
@@ -181,7 +181,7 @@ end
 ---@param prefix string
 ---@return boolean
 M.startsWith = function(str, prefix)
-	local prefixStart, prefixEnd = string.find(str, prefix)
+	local prefixStart, _ = string.find(str, prefix)
 	return prefixStart == 1 -- Ensure the prefix is at the start
 end
 
@@ -202,7 +202,7 @@ end
 ---@param suffix string
 ---@return boolean
 M.endsWith = function(str, suffix)
-	local suffixStart, suffixEnd = string.find(str, suffix, 1, true)
+	local _, suffixEnd = string.find(str, suffix, 1, true)
 	return suffixEnd == #str
 end
 
@@ -249,55 +249,13 @@ M.setup = function(functions)
 	for _, plugin in ipairs(functions) do
 		plugin(__Config)
 	end
-
-	local loggerPath = string.format("%s/%s.log", vim.api.nvim_call_function("stdpath", { "cache" }), "gotest")
-
-	function writeMessage(message)
-		local file = io.open(loggerPath, "a")
-
-		if file ~= nil then
-			local timestamp = os.date("%Y-%m-%d %H:%M:%S")
-			file:write(string.format("[%s] %s: %s\n", timestamp, vim.api.nvim_buf_get_name(0), message))
-			file:flush()
-		end
-	end
-
-	local logger = {
-		info = function(message)
-			writeMessage(message)
-		end,
-		debug = function(message)
-			if __Config.loggerLevel == "debug" then
-				writeMessage(message)
-			end
-		end,
-	}
-
-	logger.info("Hay")
-
-	M.myerrorhandler = function(err)
-		logger.info("ERROR:" .. err)
-	end
-
-	M.debug = function(message)
-		if __Config.loggerLevel == "debug" then
-			logger.debug(message)
-		end
-	end
-	---comment
-	---@param fn fun(): string
-	M.lazyDebug = function(fn)
-		if __Config.loggerLevel == "debug" then
-			logger.info(fn())
-		end
-	end
-
+	loggerModule.setup(__Config.loggerLevel)
 	M._ns = vim.api.nvim_create_namespace("lua-live-test")
 	M._group = vim.api.nvim_create_augroup("lua-live-test_au", { clear = true })
 	state.setup()
 	shower.setup()
 
-	marker.setup(M.myerrorhandler, M.lazyDebug, M._ns, M._group)
+	marker.setup(M._ns, M._group)
 end
 
 -- @return function
@@ -317,7 +275,7 @@ M.enableInfo =
 ---comment
 ---@param lines table<string>
 M.storeTestOutputs = function(lines)
-	M.lazyDebug(function()
+	lazyDebug(function()
 		return "Received " .. vim.inspect(lines)
 	end)
 	shower.keepResult(lines)
@@ -357,6 +315,7 @@ M.initializeMarker = function(setupConfig)
 			displayResults(state.states(), single_one)
 		end,
 	})
+	-- TODO extract job executor so during testing it is possible to pass text into
 	local jobId = nil
 	vim.api.nvim_create_autocmd("BufWritePost", {
 		group = group,

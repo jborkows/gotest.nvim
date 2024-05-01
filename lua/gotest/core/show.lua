@@ -42,6 +42,7 @@ M._show = function()
 		noremap = true,
 		silent = true,
 		callback = function()
+			-- TODO add xpcall
 			vim.api.nvim_win_close(win, true)
 		end,
 	})

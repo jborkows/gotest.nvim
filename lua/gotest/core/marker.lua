@@ -1,3 +1,5 @@
+local loggerModule = require("gotest.core.logging")
+local lazyDebug = loggerModule.lazyDebug
 local M = {}
 
 ---@param find_test_line fun( buffers:table<string,number>,key: TestIdentifier):integer|nil
@@ -23,10 +25,10 @@ M.displayResults = function(find_test_line)
 	return function(states, buffers)
 		local failed = {}
 		local success = {}
-		M.lazyDebug(function()
+		lazyDebug(function()
 			return "Found buffers: " .. vim.inspect(buffers)
 		end)
-		M.lazyDebug(function()
+		lazyDebug(function()
 			return "Found states: " .. vim.inspect(states)
 		end)
 		for key, singleState in pairs(states) do
@@ -37,7 +39,7 @@ M.displayResults = function(find_test_line)
 
 			local found_line = find_test_line(file_buffer_no, key)
 
-			M.lazyDebug(function()
+			lazyDebug(function()
 				return "For " .. vim.inspect(key) .. " found line" .. found_line
 			end)
 			if found_line == nil then
@@ -71,14 +73,14 @@ M.displayResults = function(find_test_line)
 		end
 
 		local text = { "✔️" }
-		M.lazyDebug(function()
+		lazyDebug(function()
 			return "Found success: " .. vim.inspect(success)
 		end)
 		for buffer_no, lines in pairs(success) do
 			for _, line in ipairs(lines) do
 				xpcall(function()
 					vim.api.nvim_buf_set_extmark(buffer_no, M._ns, line, 0, { virt_text = { text } })
-				end, M._errorhandler)
+				end, loggerModule.myerrorhandler)
 			end
 		end
 
@@ -90,9 +92,7 @@ M.displayResults = function(find_test_line)
 		end
 	end
 end
-M.setup = function(errorHandler, lazyDebug, ns, group)
-	M.lazyDebug = lazyDebug
-	M._errorhandler = errorHandler
+M.setup = function(ns, group)
 	M._group = group
 	M._ns = ns
 end
