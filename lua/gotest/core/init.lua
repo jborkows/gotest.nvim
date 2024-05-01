@@ -355,7 +355,7 @@ M.initializeMarker = function(setupConfig)
 							state.onParsing(parsed)
 							M.storeTestOutputs(state.allOutputs())
 						end
-					end, M.myerrorhandler)
+					end, loggerModule.myerrorhandler)
 				end,
 				on_exit = function()
 					jobId = nil
