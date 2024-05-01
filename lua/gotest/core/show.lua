@@ -1,6 +1,7 @@
 local M = {}
 
 local errorHandler = require("gotest.core.logging").myerrorhandler
+local lazyDebug = require("gotest.core.logging").lazyDebug
 M._lines = {}
 ---comment
 ---@param lines table<string>
@@ -44,9 +45,14 @@ M._show = function()
 		noremap = true,
 		silent = true,
 		callback = function()
-			xpcall(function()
-				vim.api.nvim_win_close(win, true)
+			local ok, _ = xpcall(function()
+				vim.api.nvim_win_close(win, false)
 			end, errorHandler)
+			lazyDebug(function()
+				if ! ok then
+					return "Failed closing window"
+				end
+			end)
 		end,
 	})
 end
