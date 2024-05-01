@@ -3,10 +3,6 @@ local parser = require("gotest.golang.parser")
 local core = require("gotest.core")
 local query = require("gotest.golang.query")
 
----comment
----@param t1 TestIdentifier
----@param t2 TestIdentifier
----@return boolean
 M.match = query.match
 
 local __Config = {
