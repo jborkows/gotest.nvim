@@ -39,12 +39,16 @@ M.displayResults = function(find_test_line)
 
 			local found_line = find_test_line(file_buffer_no, key)
 
+			if found_line == nil then
+				lazyDebug(function()
+					return "For " .. vim.inspect(key) .. "cannot find line"
+				end)
+				goto finish
+			end
+
 			lazyDebug(function()
 				return "For " .. vim.inspect(key) .. " found line" .. found_line
 			end)
-			if found_line == nil then
-				goto finish
-			end
 			if singleState == "success" then
 				if success[file_buffer_no] == nil then
 					success[file_buffer_no] = {}
