@@ -49,7 +49,7 @@ M._show = function()
 				vim.api.nvim_win_close(win, false)
 			end, errorHandler)
 			lazyDebug(function()
-				if ! ok then
+				if not ok then
 					return "Failed closing window"
 				end
 			end)
