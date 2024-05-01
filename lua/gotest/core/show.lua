@@ -1,4 +1,6 @@
 local M = {}
+
+local errorHandler = require("gotest.core.logging").myerrorhandler
 M._lines = {}
 ---comment
 ---@param lines table<string>
@@ -42,8 +44,9 @@ M._show = function()
 		noremap = true,
 		silent = true,
 		callback = function()
-			-- TODO add xpcall
-			vim.api.nvim_win_close(win, true)
+			xpcall(function()
+				vim.api.nvim_win_close(win, true)
+			end, errorHandler)
 		end,
 	})
 end
