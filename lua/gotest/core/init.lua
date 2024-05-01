@@ -4,8 +4,11 @@ local marker = require("gotest.core.marker")
 local dataModule = require("gotest.core.data")
 local loggerModule = require("gotest.core.logging")
 local paths = require("gotest.core.paths")
+
+local strings = require("gotest.core.strings")
 local M = {}
 M.state = state
+local lazyDebug = loggerModule.lazyDebug
 
 M.TestIdentifier = dataModule.TestIdentifier
 M.ParsingResult = dataModule.ParsingResult
@@ -40,7 +43,6 @@ end
 
 M.relative = paths.relative
 M.projectPath = paths.projectPath
-local strings = require("gotest.core.strings")
 M.removePrefix = strings.removePrefix
 M.startsWith = strings.startsWith
 M.removeSuffix = strings.removeSuffix
