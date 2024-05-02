@@ -8,7 +8,7 @@ local loggerModule = require("gotest.core.logging")
 --- @field showSuccess fun(lines:table<integer>)
 
 local successText = "✔️"
-local failureText = "❌"
+local failureText = "Failed ❌"
 
 ---@class MarkerViewFactory
 ---@field viewFor fun(ns:integer, buffor_number:integer):MarkerView
@@ -47,15 +47,15 @@ local M = {
 			---@param lines table<integer>
 			showSuccess = function(lines)
 				for _, line in ipairs(lines) do
-					xpcall(function()
-						vim.api.nvim_buf_set_extmark(
-							buffor_number,
-							ns,
-							line,
-							0,
-							{ virt_text = { { successText, "OkMarking" } } }
-						)
-					end, loggerModule.myerrorhandler)
+					-- xpcall(function()
+					-- 	vim.api.nvim_buf_set_extmark(
+					-- 		buffor_number,
+					-- 		ns,
+					-- 		line,
+					-- 		0,
+					-- 		{ virt_text = { { successText, "OkMarking" } } }
+					-- 	)
+					-- end, loggerModule.myerrorhandler)
 				end
 			end,
 		}
