@@ -56,7 +56,7 @@ local M = {
 							ns,
 							line,
 							0,
-							{ virt_text = { { successText } }, hl_group = "OkMarking" }
+							{ virt_text = { { successText, "OkMarking" } } }
 						)
 					end, loggerModule.myerrorhandler)
 				end
