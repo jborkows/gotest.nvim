@@ -12,6 +12,7 @@ local successText = "✔️"
 ---@class MarkerViewFactory
 ---@field viewFor fun(ns:integer, buffor_number:integer):MarkerView
 
+vim.api.nvim_set_hl(0, "OkMarking", { fg = "#FF0000", bg = "#00FF00", bold = true })
 local M = {
 
 	---comment
@@ -19,7 +20,6 @@ local M = {
 	---@param buffor_number integer
 	---@return MarkerView
 	viewFor = function(ns, buffor_number)
-		vim.api.nvim_set_hl(ns, "OkMarking", { fg = "#FF0000", bg = "#00FF00", bold = true })
 		local view = {
 			---@param failures table<Failure>
 			showFailures = function(failures)
