@@ -12,7 +12,7 @@ local successText = "✔️"
 ---@class MarkerViewFactory
 ---@field viewFor fun(ns:integer, buffor_number:integer):MarkerView
 
-vim.api.nvim_set_hl(0, "OkMarking", { fg = "#FF0000", bg = "#00FF00", bold = true })
+vim.api.nvim_set_hl(0, "OkMarking", { fg = "#00FF00", bold = false })
 local M = {
 
 	---comment
