@@ -7,11 +7,23 @@ M.match = query.match
 
 local __Config = {
 	command = { "go", "test", "./...", "-v", "-race", "-shuffle=on", "-json" },
+	pattern = "*_test.go",
 }
 
+---
+---@param cmd table<string>
+---@return function
 M.TestCommand = function(cmd)
 	return function(config)
 		config.command = cmd
+	end
+end
+
+---@param inputPattern string
+---@return function
+M.TestFilePattern = function(inputPattern)
+	return function(config)
+		config.pattern = inputPattern
 	end
 end
 
@@ -21,8 +33,10 @@ M.setup = function(functions)
 		plugin(__Config)
 	end
 
+	require("gotest.core.tschecker").checkLanguage("go")
+
 	core.initializeMarker({
-		pattern = "*.go",
+		pattern = __Config.pattern,
 		bufforNameProcessor = function(buffor_name, buffor_number)
 			return query.package_name_query(buffor_number) or buffor_name
 		end,
