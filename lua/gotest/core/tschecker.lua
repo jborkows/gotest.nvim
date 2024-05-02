@@ -12,7 +12,7 @@ end
 ---checks if Treesitter language is installed and installs it if it is not there
 ---@param languageName string
 M.checkLanguage = function(languageName)
-	if is_plugin_installed("nvim-treesitter") then
+	if is_plugin_installed("nvim-treesitter") == nil then
 		print("Nvim treesitter is not installed!")
 		return
 	end
