@@ -18,13 +18,12 @@ local find_buffer = function(buffers, key)
 	end
 end
 
-local viewFactory = require("gotest.core.markerView")
-
 ---comment
 ---@param ns
+---@param viewFactory
 ---@param find_test_line fun(bufnr:number,key: TestIdentifier):integer|nil
 ---@return fun(states:table<TestIdentifier,State>,buffers:table<string,number>)
-M.displayResults = function(ns, find_test_line)
+M.displayResults = function(ns, viewFactory, find_test_line)
 	return function(states, buffers)
 		--- @type table<integer,table<Failure>>
 		local failed = {}
