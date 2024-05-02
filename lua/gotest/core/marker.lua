@@ -64,10 +64,12 @@ M.displayResults = function(ns, viewFactory, find_test_line)
 				if failed[file_buffer_no] == nil then
 					failed[file_buffer_no] = {}
 				end
-				table.insert(failed[file_buffer_no], {
-					bufnr = file_buffer_no,
-					lnum = found_line,
-				})
+				---@type Failure
+				local failure = {
+					buffor_number = file_buffer_no,
+					line_number = found_line,
+				}
+				table.insert(failed[file_buffer_no], failure)
 				goto finish
 			end
 
