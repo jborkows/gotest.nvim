@@ -5,7 +5,7 @@ local function is_plugin_installed(name)
 end
 -- Function to check if TS grammar for a language is installed
 local function is_ts_language_installed(lang)
-	local ts = require("nvim-treesitter.install")
+	local ts = require("nvim-treesitter")
 	local installed = ts.is_installed(lang)
 	return installed
 end
