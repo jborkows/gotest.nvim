@@ -50,6 +50,12 @@ M.setup = function(...)
 				return logging.setup
 			end,
 		},
+		{
+			type = "core",
+			setup = function()
+				return require("gotest.core").setup
+			end
+		}
 
 		{
 			type = "Lua",

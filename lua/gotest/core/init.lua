@@ -50,8 +50,7 @@ M.endsWith = strings.endsWith
 M.trim = strings.trim
 M.split = strings.split
 
--- @param ... function[]
-M.setup = function(functions)
+M.setup = function()
 	M._ns = vim.api.nvim_create_namespace("lua-live-test")
 	M._group = vim.api.nvim_create_augroup("lua-live-test_au", { clear = true })
 	state.setup()
