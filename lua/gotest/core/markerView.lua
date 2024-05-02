@@ -34,17 +34,14 @@ local M = {
 						vim.api.nvim_buf_set_extmark(
 							buffor_number,
 							ns,
-							value.line,
+							value.line_number,
 							0,
 							{ virt_text = { { failureText, "FailureMarking" } } }
 						)
 					end, loggerModule.myerrorhandler)
 				end
 
-				vim.notify(
-					string.format("Tests in %s failed.", vim.api.nvim_buf_get_name(buffor_number)),
-					vim.log.levels.ERROR
-				)
+				print(string.format("Tests in %s failed.", vim.api.nvim_buf_get_name(buffor_number)))
 			end,
 			---comment
 			---@param lines table<integer>
