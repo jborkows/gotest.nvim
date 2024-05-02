@@ -21,5 +21,4 @@ M.checkLanguage = function(languageName)
 		vim.api.nvim_command("TSInstall " .. languageName)
 	end
 end
--- Install TS grammar for Go if nvim-treesitter is installed and Go isn't installed
 return M

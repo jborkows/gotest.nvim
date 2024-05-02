@@ -18,11 +18,15 @@ local find_buffer = function(buffers, key)
 	end
 end
 
+local viewFactory = require("gotest.core.markerView")
+
 ---comment
+---@param ns
 ---@param find_test_line fun(bufnr:number,key: TestIdentifier):integer|nil
 ---@return fun(states:table<TestIdentifier,State>,buffers:table<string,number>)
-M.displayResults = function(find_test_line)
+M.displayResults = function(ns, find_test_line)
 	return function(states, buffers)
+		--- @type table<integer,table<Failure>>
 		local failed = {}
 		local success = {}
 		lazyDebug(function()
@@ -64,11 +68,6 @@ M.displayResults = function(find_test_line)
 				table.insert(failed[file_buffer_no], {
 					bufnr = file_buffer_no,
 					lnum = found_line,
-					col = 1,
-					severity = vim.diagnostic.severity.ERROR,
-					source = "testing-fun",
-					message = "Test failed",
-					user_data = {},
 				})
 				goto finish
 			end
@@ -76,28 +75,18 @@ M.displayResults = function(find_test_line)
 			::finish::
 		end
 
-		local text = { "✔️" }
 		lazyDebug(function()
 			return "Found success: " .. vim.inspect(success)
 		end)
 		for buffer_no, lines in pairs(success) do
-			for _, line in ipairs(lines) do
-				xpcall(function()
-					vim.api.nvim_buf_set_extmark(buffer_no, M._ns, line, 0, { virt_text = { text } })
-				end, loggerModule.myerrorhandler)
-			end
+			local view = viewFactory.viewFor(ns, buffer_no)
+			view.showSuccess(lines)
 		end
 
 		for buffer_no, failures in pairs(failed) do
-			vim.diagnostic.set(M._ns, buffer_no, failures, {})
-		end
-		if table.maxn(failed) > 0 then
-			vim.notify("Test failed", vim.log.levels.ERROR)
+			local view = viewFactory.viewFor(ns, buffer_no)
+			view.showFailures(failures)
 		end
 	end
-end
-M.setup = function(ns, group)
-	M._group = group
-	M._ns = ns
 end
 return M

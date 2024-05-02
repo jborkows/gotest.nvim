@@ -55,8 +55,6 @@ M.setup = function()
 	M._group = vim.api.nvim_create_augroup("lua-live-test_au", { clear = true })
 	state.setup()
 	shower.setup()
-
-	marker.setup(M._ns, M._group)
 end
 
 ---comment
@@ -68,7 +66,8 @@ M.storeTestOutputs = function(lines)
 	shower.keepResult(lines)
 end
 
-M.marker = marker
+---@type MarkerViewFactory
+local markerViewFactory = require("gotest.core.markerView")
 
 ---@class TestOutputParser
 ---@field parse fun(text:string):ParsingResult
@@ -86,7 +85,7 @@ M.initializeMarker = function(setupConfig)
 	local ns = M._ns
 	local group = M._group
 
-	local displayResults = M.marker.displayResults(setupConfig.findTestLine)
+	local displayResults = marker.displayResults(ns, markerViewFactory, setupConfig.findTestLine)
 	local bufferNum = {}
 	vim.api.nvim_create_autocmd("BufEnter", {
 
