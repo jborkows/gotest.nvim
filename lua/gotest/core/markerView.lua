@@ -15,6 +15,20 @@ local failureText = "Failed ❌"
 
 vim.api.nvim_set_hl(0, "OkMarking", { fg = "#00FF00", bold = false })
 vim.api.nvim_set_hl(0, "FailureMarking", { fg = "#FF0000", bold = false })
+
+local showFailed = function(buffor_number)
+	local message = string.format("Tests in %s failed.", vim.api.nvim_buf_get_name(buffor_number))
+	local ok, _ = pcall(function()
+		local notify = require("notify")
+		notify.notify(message, "error", { title = "Test Failed" })
+	end)
+
+	if ok then
+		return
+	end
+	print(message)
+end
+
 local M = {
 
 	---comment
@@ -40,8 +54,7 @@ local M = {
 						)
 					end, loggerModule.myerrorhandler)
 				end
-
-				print(string.format("Tests in %s failed.", vim.api.nvim_buf_get_name(buffor_number)))
+				showFailed(buffor_number)
 			end,
 			---comment
 			---@param lines table<integer>
