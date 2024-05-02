@@ -47,15 +47,15 @@ local M = {
 			---@param lines table<integer>
 			showSuccess = function(lines)
 				for _, line in ipairs(lines) do
-					-- xpcall(function()
-					-- 	vim.api.nvim_buf_set_extmark(
-					-- 		buffor_number,
-					-- 		ns,
-					-- 		line,
-					-- 		0,
-					-- 		{ virt_text = { { successText, "OkMarking" } } }
-					-- 	)
-					-- end, loggerModule.myerrorhandler)
+					xpcall(function()
+						vim.api.nvim_buf_set_extmark(
+							buffor_number,
+							ns,
+							line,
+							0,
+							{ virt_text = { { successText, "OkMarking" } } }
+						)
+					end, loggerModule.myerrorhandler)
 				end
 			end,
 		}

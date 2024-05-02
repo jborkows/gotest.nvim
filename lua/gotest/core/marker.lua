@@ -82,6 +82,9 @@ M.displayResults = function(ns, viewFactory, find_test_line)
 			view.showSuccess(lines)
 		end
 
+		lazyDebug(function()
+			return "Found failures: " .. vim.inspect(failed)
+		end)
 		for buffer_no, failures in pairs(failed) do
 			local view = viewFactory.viewFor(ns, buffer_no)
 			view.showFailures(failures)
