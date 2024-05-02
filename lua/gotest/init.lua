@@ -1,19 +1,18 @@
 local M = {}
-local core = require("gotest.core")
-local luaCore = require("gotest.lua")
-local golangCore = require("gotest.golang")
 
 M.debug = function()
+	local logging = require("gotest.core.logging")
 	return {
 		type = "Logging",
-		fn = core.enableDebug,
+		fn = logging.enableDebug,
 	}
 end
 
 M.info = function()
+	local logging = require("gotest.core.logging")
 	return {
 		type = "Logging",
-		fn = core.enableInfo,
+		fn = logging.enableInfo,
 	}
 end
 
@@ -21,6 +20,7 @@ end
 ---@param cmd table<string>
 ---@return table
 M.luaTestCommand = function(cmd)
+	local luaCore = require("gotest.lua")
 	return {
 		type = "Lua",
 		fn = luaCore.luaTestCommand(cmd),
@@ -31,6 +31,7 @@ end
 ---@param cmd table<string>
 ---@return fun():table
 M.goTestCommand = function(cmd)
+	local golangCore = require("gotest.golang")
 	return function()
 		return {
 			type = "Go",
@@ -45,7 +46,8 @@ M.setup = function(...)
 		{
 			type = "Logging",
 			setup = function()
-				return require("gotest.core").setup
+				local logging = require("gotest.core.logging")
+				return logging.setup
 			end,
 		},
 

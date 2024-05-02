@@ -50,19 +50,8 @@ M.endsWith = strings.endsWith
 M.trim = strings.trim
 M.split = strings.split
 
--- @class __Config
--- @field logerLevel string
--- @field UserCommandName string
-local __Config = {
-	loggerLevel = "info",
-}
-
 -- @param ... function[]
 M.setup = function(functions)
-	for _, plugin in ipairs(functions) do
-		plugin(__Config)
-	end
-	loggerModule.setup(__Config.loggerLevel)
 	M._ns = vim.api.nvim_create_namespace("lua-live-test")
 	M._group = vim.api.nvim_create_augroup("lua-live-test_au", { clear = true })
 	state.setup()
@@ -71,20 +60,6 @@ M.setup = function(functions)
 	marker.setup(M._ns, M._group)
 end
 
--- @return function
--- @param _config __Config
-M.enableDebug =
--- @param _config __Config
-    function(_config)
-	    _config.loggerLevel = "debug"
-    end
--- @return function
--- @param _config __Config
-M.enableInfo =
--- @param _config __Config
-    function(_config)
-	    _config.loggerLevel = "info"
-    end
 ---comment
 ---@param lines table<string>
 M.storeTestOutputs = function(lines)

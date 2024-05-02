@@ -52,7 +52,21 @@ M.debug = logger.debug
 M.info = logger.info
 ---comment
 ---@param inputLevel "info"|"debug"
-M.setup = function(inputLevel)
-	level = inputLevel
+
+-- @param ... function[]
+M.setup = function(functions)
+	for _, plugin in ipairs(functions) do
+		plugin()
+	end
+end
+
+-- @return fun():void
+M.enableDebug = function()
+	level = "debug"
+end
+
+-- @return fun():void
+M.enableInfo = function()
+	level = "info"
 end
 return M
