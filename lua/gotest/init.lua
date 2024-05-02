@@ -54,9 +54,8 @@ M.setup = function(...)
 			type = "core",
 			setup = function()
 				return require("gotest.core").setup
-			end
-		}
-
+			end,
+		},
 		{
 			type = "Lua",
 			setup = function()
