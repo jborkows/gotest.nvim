@@ -1,10 +1,15 @@
 local M = {}
 local core = require("gotest.core")
 
+local loggerModule = require("gotest.core.logging")
+local lazyDebug = loggerModule.lazyDebug
 ---comment
 ---@param text string
 ---@return ParsingResult
 M.parse = function(text)
+	lazyDebug(function()
+		return "Processing: " .. text
+	end)
 	if not core.startsWith(text, "{") then
 		return core.ParsingResult:none()
 	end
