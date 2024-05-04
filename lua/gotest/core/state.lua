@@ -1,19 +1,70 @@
 local M = {}
 
 --- @alias State "start"|"success"|"failure"|"N/A"|"run"
---- table<TestIdentifier,State>
-M.__states = {}
---- table <TestIdentifier, string[]>
-M.__test_messages = {}
 
---- string[]
-M.__messages = {}
+--- @class TestState
+--- @field key TestIdentifier
+--- @field state State|nil
+--- @field messages string[]
+local TestState = {}
+TestState.__index = TestState
+---
+---@param key TestIdentifier
+---@return TestState
+function TestState:new(key)
+	local a = setmetatable({}, TestState)
+	a.key = key
+	a.messages = {}
+	return a
+end
 
----@alias StateMachine "finished"|"running"|"notstarted"
+---@return State
+function TestState:status()
+	local value = self.state
+	if value ~= nil then
+		return value
+	else
+		return "N/A"
+	end
+end
 
----@param state State|nil
----@return StateMachine
-local stateTranslator = function(state)
+---@return string
+function TestState:asKey()
+	return self.key.packageName .. "->" .. self.key.testName
+end
+
+---@param state State
+function TestState:changeState(state)
+	self.state = state
+end
+
+local TestStateManager = {
+	---@type table<string,TestState>
+	tests = {},
+	---@type table<string>
+	messages = {},
+}
+
+---comment
+---@param key TestIdentifier
+---@return TestState
+function TestStateManager:get(key)
+	local testState = TestState:new(key)
+	local stringKey = testState:asKey()
+	if self.tests[stringKey] == nil then
+		self.tests[stringKey] = testState
+	end
+	return self.tests[stringKey]
+end
+
+---@param message string
+function TestState:addMessage(message)
+	table.insert(self.messages, message)
+end
+
+---@return StateMachine|nil
+function TestState:translate()
+	local state = self.state
 	if state == nil then
 		return "notstarted"
 	elseif state == "success" then
@@ -22,34 +73,57 @@ local stateTranslator = function(state)
 		return "finished"
 	elseif state == "run" then
 		return "running"
+	else
+		return nil
 	end
 end
 
----@param key TestIdentifier
----@return string
-local asKey = function(key)
-	return key.testName .. " " .. key.packageName
+---@param message ParsingResult
+function TestStateManager:reactOn(message)
+	self:changeState(message)
+	self:addMessage(message)
 end
 
----@param state State
----@param key TestIdentifier
-local stateReactor = function(state, key)
-	local oldState = M.__states[asKey(key)]
-	local oldStateValue = nil
-	if oldState ~= nil then
-		oldStateValue = oldState.state
+---@param message ParsingResult
+function TestStateManager:changeState(message)
+	local event = message.event
+	if event == nil then
+		return
 	end
-	local machineState = stateTranslator(oldStateValue)
+	local state = event.type
+	local key = event.key
+	local testState = self:get(key)
+	local machineState = testState:translate()
 	if machineState == "notstarted" then
 		--NOP
 	elseif machineState == "finished" then
-		M.__test_messages[key] = {}
+		testState.messages = {}
 	end
-	M.__states[asKey(key)] = {
-		state = state,
-		key = key,
-	}
+	testState.state = state
 end
+
+function TestStateManager:clear()
+	self.messages = {}
+	self.tests = {}
+end
+
+---@param message ParsingResult
+function TestStateManager:addMessage(message)
+	local output = message.output
+	if output == nil then
+		return
+	end
+	table.insert(self.messages, output.message)
+
+	local key = output.key
+	if key == nil then
+		return
+	end
+	local testState = self:get(key)
+	testState:addMessage(output.message)
+end
+
+---@alias StateMachine "finished"|"running"|"notstarted"
 
 ---@param message ParsingResult
 M.onParsing = function(message)
@@ -61,65 +135,48 @@ M.onParsing = function(message)
 		M.setup()
 		return
 	end
-	if message.event ~= nil then
-		stateReactor(message.event.type, message.event.key)
-	end
-
-	if message.output ~= nil then
-		if message.output ~= nil then
-			table.insert(M.__messages, message.output.message)
-			if message.output.key ~= nil then
-				if M.__test_messages[message.output.key] == nil then
-					M.__test_messages[message.output.key] = {}
-				end
-				table.insert(M.__test_messages[message.output.key], message.output.message)
-			end
-		end
-	end
+	TestStateManager:reactOn(message)
 end
 ---comment
 ---@param key TestIdentifier
 ---@return State
 M.state = function(key)
-	local value = M.__states[asKey(key)]
-	if value ~= nil then
-		return value.state
-	else
-		return "N/A"
-	end
+	local state = TestStateManager:get(key)
+	return state.status()
 end
 
 ---comment
 ---@return table<TestIdentifier, State>
 M.states = function()
 	local result = {}
-	for _, value in pairs(M.__states) do
+	for _, value in pairs(TestStateManager.tests) do
 		result[value.key] = value.state
 	end
 	return result
+end
+
+---@param key:TestIdentifier
+---@return State
+M.state = function(key)
+	local state = TestStateManager:get(key)
+	return state:status()
 end
 
 ---comment
 ---@param key TestIdentifier
 ---@return string[]
 M.outputs = function(key)
-	if M.__test_messages[key] == nil then
-		return {}
-	else
-		return M.__test_messages[key]
-	end
-end ---comment
+	return TestStateManager:get(key).messages
+end
 
 --- all gathered entries from stdin
 ---@return string[]
 M.allOutputs = function()
-	return M.__messages
+	return TestStateManager.messages
 end
 
 M.setup = function()
-	M.__messages = {}
-	M.__states = {}
-	M.__test_messages = {}
+	TestStateManager:clear()
 end
 
 return M
