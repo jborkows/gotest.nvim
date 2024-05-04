@@ -6,6 +6,7 @@ local M = {}
 ---@param prefix string
 ---@return TestOutputParser
 M.parser = function(prefix)
+	print("Prefix " .. prefix)
 	---@type TestOutputParser
 	local Parser = {}
 	local packageName = ""
@@ -16,9 +17,12 @@ M.parser = function(prefix)
 			end
 
 			local pattern = "Testing:%s*" .. prefix .. "(.*).lua"
+
 			local extracted = string.match(text, pattern)
+			print("Extracted: " .. (extracted or "Not"))
 			if extracted ~= nil then
 				packageName = core.trim(extracted)
+				print("Found " .. packageName)
 				return core.ParsingResult:none()
 			end
 

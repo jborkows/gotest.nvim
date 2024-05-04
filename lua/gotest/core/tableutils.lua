@@ -5,12 +5,15 @@ local M = {}
 ---@param predicate fun(entry:T):boolean
 ---@return boolean
 M.contains = function(entries, predicate)
+	print("Entries " .. vim.inspect(entries))
 	if entries == nil then
 		return false
 	end
 
 	for _, value in ipairs(entries) do
+		print("Processing " .. vim.inspect(value))
 		if predicate(value) == true then
+			print("Processing found")
 			return true
 		end
 	end

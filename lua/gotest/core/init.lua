@@ -76,7 +76,9 @@ local runCommand = require("gotest.core.launcher").runCommand
 ---@param factory MarkerViewFactory
 M.__useMarkerView = function(factory)
 	local old = markerViewFactory
+	print("overwritting marker view")
 	markerViewFactory = factory
+	return old
 end
 
 ---test only
@@ -98,13 +100,16 @@ end
 ---@field findTestLine fun(buffnr:integer, key:TestIdentifier):integer|nil
 ---@field parserProvider fun():  TestOutputParser
 
+local saveCommands = {}
 ---Initialize package autocommands
 ---@param setupConfig SetupConfig
 M.initializeMarker = function(setupConfig)
 	local ns = M._ns
 	local group = M._group
 
-	local displayResults = marker.displayResults(ns, markerViewFactory, setupConfig.findTestLine)
+	local displayResults = marker.displayResults(ns, function()
+		return markerViewFactory
+	end, setupConfig.findTestLine)
 	local bufferNum = {}
 	vim.api.nvim_create_autocmd("BufEnter", {
 
@@ -123,37 +128,59 @@ M.initializeMarker = function(setupConfig)
 			displayResults(state.states(), single_one)
 		end,
 	})
+	local save = function()
+		local buffnr = vim.api.nvim_get_current_buf()
+		local buffor_name = vim.api.nvim_buf_get_name(buffnr)
+
+		local normalized_name = setupConfig.bufforNameProcessor(buffor_name, 0)
+		if normalized_name ~= nil then
+			bufferNum[normalized_name] = buffnr
+			vim.api.nvim_buf_clear_namespace(buffnr, ns, 0, -1)
+		end
+		local aParser = setupConfig.parserProvider()
+
+		--TODO make it smarter for cache reasons
+		--rewrite state... to one map
+		state.setup()
+
+		runCommand(setupConfig.testCommand, {
+			onData = function(line)
+				local parsed = aParser.parse(line)
+				state.onParsing(parsed)
+
+				print("parsed -> " .. vim.inspect(parsed))
+				M.storeTestOutputs(state.allOutputs())
+			end,
+			onExit = function()
+				print("States -> " .. vim.inspect(state.states()))
+				displayResults(state.states(), bufferNum)
+				M.storeTestOutputs(state.allOutputs())
+			end,
+		})
+	end
+
+	saveCommands[setupConfig.pattern] = save
 	vim.api.nvim_create_autocmd("BufWritePost", {
 		group = group,
 		pattern = setupConfig.pattern,
-		callback = function()
-			local buffnr = vim.api.nvim_get_current_buf()
-			local buffor_name = vim.api.nvim_buf_get_name(buffnr)
-
-			local normalized_name = setupConfig.bufforNameProcessor(buffor_name, 0)
-			if normalized_name ~= nil then
-				bufferNum[normalized_name] = buffnr
-				vim.api.nvim_buf_clear_namespace(buffnr, ns, 0, -1)
-			end
-			local aParser = setupConfig.parserProvider()
-
-			--TODO make it smarter for cache reasons
-			--rewrite state... to one map
-			state.setup()
-
-			runCommand(setupConfig.testCommand, {
-				onData = function(line)
-					local parsed = aParser.parse(line)
-					state.onParsing(parsed)
-					M.storeTestOutputs(state.allOutputs())
-				end,
-				onExit = function()
-					displayResults(state.states(), bufferNum)
-					M.storeTestOutputs(state.allOutputs())
-				end,
-			})
-		end,
+		callback = save,
 	})
 end
+
+M.executeTests = function()
+	for pattern, fn in pairs(saveCommands) do
+		local name = vim.api.nvim_buf_get_name(vim.api.nvim_get_current_buf())
+		if string.gmatch(name, pattern) then
+			fn()
+			return
+		end
+	end
+	if saveCommands == nil then
+		return
+	end
+end
+vim.api.nvim_create_user_command("ExecuteTests", function()
+	M.executeTests()
+end, {})
 
 return M

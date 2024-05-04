@@ -4,8 +4,10 @@
 local function runnerFromText(text)
 	return function(command, handler)
 		for line in text:gmatch("([^\n]+)") do
+			print("Line " .. line .. "...")
 			handler.onData(line)
 		end
+		print("$$$$$$$$$$$$$$$$$$$$$$$")
 		handler.onExit()
 	end
 end
@@ -28,12 +30,14 @@ local function spyingMarkerView()
 			observedFailures = failures
 		end,
 		showSuccess = function(lines)
+			print("Adding " .. vim.inspect(lines))
 			observedSuccesses = lines
 		end,
 	}
 	---@type MarkerViewFactory
 	local factory = {
 		viewFor = function(_, _)
+			print("ViewFor is called")
 			return MarkerView
 		end,
 	}
@@ -42,17 +46,23 @@ local function spyingMarkerView()
 	return {
 		__factory = factory,
 		wasSuccess = function(lineNumber)
-			return tableutils.containsElement(observedSuccesses, lineNumber)
+			print("Successes: " .. vim.inspect(observedSuccesses) .. " searching for " .. (lineNumber - 1))
+			return tableutils.containsElement(observedSuccesses, lineNumber - 1)
 		end,
 		wasFailure = function(lineNumber, bufforNumber)
-			local bufforNumber = bufforNumber or vim.api.nvim_get_current_buf()
-			print("Failures: " .. vim.inspect(observedFailures))
+			print(
+				"Failures: "
+				.. vim.inspect(observedFailures)
+				.. " searching for "
+				.. (lineNumber - 1)
+				.. " in "
+				.. bufforNumber
+			)
 			return tableutils.contains(observedFailures, function(entry)
 				---@type Failure
 				local elem = entry
-				return elem.buffor_number == bufforNumber and elem.line_number == lineNumber
+				return (elem.buffor_number == bufforNumber) and (elem.line_number == (lineNumber - 1))
 			end)
-			return found
 		end,
 	}
 end
