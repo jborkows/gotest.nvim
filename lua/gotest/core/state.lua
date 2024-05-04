@@ -104,7 +104,6 @@ end
 
 function TestStateManager:clear()
 	self.messages = {}
-	self.tests = {}
 end
 
 ---@param message ParsingResult
