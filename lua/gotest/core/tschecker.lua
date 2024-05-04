@@ -11,6 +11,9 @@ M.checkLanguage = function(languageName)
 		return
 	end
 
-	vim.api.nvim_command("TSUpdate " .. languageName)
+	local loggerModule = require("gotest.core.logging")
+	xpcall(function()
+		vim.api.nvim_command("TSUpdate " .. languageName)
+	end, loggerModule.myerrorhandler)
 end
 return M

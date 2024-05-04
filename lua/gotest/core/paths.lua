@@ -20,6 +20,9 @@ local project_root = find_project_root()
 M.relative = function(path)
 	return strings.removePrefix(path, project_root)
 end
+M.currentFilePath = function()
+	return vim.fn.expand("%:p:h")
+end
 
 ---comment
 ---@param relativePath string

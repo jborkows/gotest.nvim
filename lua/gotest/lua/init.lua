@@ -20,7 +20,7 @@ M.match = function(t1, t2)
 end
 ---comment
 ---@param test_package_prefix string
----@return Parser
+---@return TestOutputParser
 M.parser = function(test_package_prefix)
 	return parser.parser(test_package_prefix)
 end

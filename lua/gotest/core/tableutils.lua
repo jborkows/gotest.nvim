@@ -8,6 +8,7 @@ M.contains = function(entries, predicate)
 	if entries == nil then
 		return false
 	end
+
 	for _, value in ipairs(entries) do
 		if predicate(value) == true then
 			return true

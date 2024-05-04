@@ -69,6 +69,25 @@ end
 ---@type MarkerViewFactory
 local markerViewFactory = require("gotest.core.markerView")
 
+---@type RunCommand
+local runCommand = require("gotest.core.launcher").runCommand
+
+---test only
+---@param factory MarkerViewFactory
+M.__useMarkerView = function(factory)
+	local old = markerViewFactory
+	markerViewFactory = factory
+end
+
+---test only
+---@param runner RunCommand
+---@return RunCommand
+M.__useRunner = function(runner)
+	local old = runCommand
+	runCommand = runner
+	return old
+end
+
 ---@class TestOutputParser
 ---@field parse fun(text:string):ParsingResult
 
@@ -104,8 +123,6 @@ M.initializeMarker = function(setupConfig)
 			displayResults(state.states(), single_one)
 		end,
 	})
-	-- TODO extract job executor so during testing it is possible to pass text into
-	local jobId = nil
 	vim.api.nvim_create_autocmd("BufWritePost", {
 		group = group,
 		pattern = setupConfig.pattern,
@@ -120,34 +137,17 @@ M.initializeMarker = function(setupConfig)
 			end
 			local aParser = setupConfig.parserProvider()
 
+			--TODO make it smarter for cache reasons
+			--rewrite state... to one map
 			state.setup()
-			if jobId ~= nil then
-				vim.fn.jobstop(jobId)
-			end
-			lazyDebug(function()
-				return "Running command: " .. vim.inspect(setupConfig.testCommand)
-			end)
-			jobId = vim.fn.jobstart(setupConfig.testCommand, {
-				stdout_buffered = true,
-				on_stderr = function(_, data)
-					lazyDebug(function()
-						return "Error stream: " .. vim.inspect(data)
-					end)
+
+			runCommand(setupConfig.testCommand, {
+				onData = function(line)
+					local parsed = aParser.parse(line)
+					state.onParsing(parsed)
+					M.storeTestOutputs(state.allOutputs())
 				end,
-				on_stdout = function(_, data)
-					if not data then
-						return
-					end -- if data are present append lines starting from end of file (-1) to end of file (-1)
-					xpcall(function()
-						for _, line in ipairs(data) do
-							local parsed = aParser.parse(line)
-							state.onParsing(parsed)
-							M.storeTestOutputs(state.allOutputs())
-						end
-					end, loggerModule.myerrorhandler)
-				end,
-				on_exit = function()
-					jobId = nil
+				onExit = function()
 					displayResults(state.states(), bufferNum)
 					M.storeTestOutputs(state.allOutputs())
 				end,
