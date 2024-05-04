@@ -36,6 +36,8 @@ M.setup = function(functions)
 	require("gotest.core.tschecker").checkLanguage("go")
 
 	core.initializeMarker({
+
+		interestedFilesSuffix = ".go",
 		pattern = __Config.pattern,
 		bufforNameProcessor = function(buffor_name, buffor_number)
 			return query.package_name_query(buffor_number) or buffor_name

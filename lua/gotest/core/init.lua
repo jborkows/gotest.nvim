@@ -95,6 +95,7 @@ end
 
 ---@class SetupConfig
 ---@field pattern string
+---@field interestedFilesSuffix string
 ---@field testCommand table<string>
 ---@field bufforNameProcessor fun(text:string, buffnr:integer):string|nil
 ---@field findTestLine fun(buffnr:integer, key:TestIdentifier):integer|nil
@@ -128,7 +129,7 @@ M.initializeMarker = function(setupConfig)
 			displayResults(state.states(), single_one)
 		end,
 	})
-	local save = function()
+	local save = function(setupConfig)
 		local buffnr = vim.api.nvim_get_current_buf()
 		local buffor_name = vim.api.nvim_buf_get_name(buffnr)
 
@@ -159,19 +160,23 @@ M.initializeMarker = function(setupConfig)
 		})
 	end
 
-	saveCommands[setupConfig.pattern] = save
+	saveCommands[setupConfig.pattern] = { save, setupConfig }
 	vim.api.nvim_create_autocmd("BufWritePost", {
 		group = group,
 		pattern = setupConfig.pattern,
-		callback = save,
+		callback = function()
+			save(setupConfig)
+		end,
 	})
 end
 
 M.executeTests = function()
+	print(vim.inspect(saveCommands))
 	for pattern, fn in pairs(saveCommands) do
 		local name = vim.api.nvim_buf_get_name(vim.api.nvim_get_current_buf())
-		if string.gmatch(name, pattern) then
-			fn()
+		if require("gotest.core.strings").endsWith(name, fn[2].interestedFilesSuffix) then
+			print("Matched (really)" .. name .. " to pattern " .. pattern .. " with " .. vim.inspect(fn[2]))
+			fn[1](fn[2])
 			return
 		end
 	end

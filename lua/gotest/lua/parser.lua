@@ -29,6 +29,7 @@ M.parser = function(prefix)
 			if string.find(text, "||") then
 				local splitted = core.split(text, "||")
 				local what = core.trim(splitted[2])
+				print("Say '" .. what .. "'")
 				if string.find(splitted[1], "Success") then
 					return core.ParsingResult:onlyEvent(core.success(core.TestIdentifier:new(
 					packageName, what)))
@@ -38,6 +39,8 @@ M.parser = function(prefix)
 					return core.ParsingResult:onlyEvent(core.failure(core.TestIdentifier:new(
 					packageName, what)))
 				end
+			else
+				print("Bummer for " .. text)
 			end
 
 			return core.ParsingResult:none()
