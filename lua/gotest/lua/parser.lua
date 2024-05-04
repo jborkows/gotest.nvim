@@ -6,7 +6,6 @@ local M = {}
 ---@param prefix string
 ---@return TestOutputParser
 M.parser = function(prefix)
-	print("Prefix " .. prefix)
 	---@type TestOutputParser
 	local Parser = {}
 	local packageName = ""
@@ -19,17 +18,14 @@ M.parser = function(prefix)
 			local pattern = "Testing:%s*" .. prefix .. "(.*).lua"
 
 			local extracted = string.match(text, pattern)
-			print("Extracted: " .. (extracted or "Not"))
 			if extracted ~= nil then
 				packageName = core.trim(extracted)
-				print("Found " .. packageName)
 				return core.ParsingResult:none()
 			end
 
 			if string.find(text, "||") then
 				local splitted = core.split(text, "||")
 				local what = core.trim(splitted[2])
-				print("Say '" .. what .. "'")
 				if string.find(splitted[1], "Success") then
 					return core.ParsingResult:onlyEvent(core.success(core.TestIdentifier:new(
 					packageName, what)))
@@ -40,7 +36,6 @@ M.parser = function(prefix)
 					packageName, what)))
 				end
 			else
-				print("Bummer for " .. text)
 			end
 
 			return core.ParsingResult:none()

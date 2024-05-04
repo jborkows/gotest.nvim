@@ -76,7 +76,6 @@ local runCommand = require("gotest.core.launcher").runCommand
 ---@param factory MarkerViewFactory
 M.__useMarkerView = function(factory)
 	local old = markerViewFactory
-	print("overwritting marker view")
 	markerViewFactory = factory
 	return old
 end
@@ -148,19 +147,16 @@ M.initializeMarker = function(setupConfig)
 			onData = function(line)
 				local parsed = aParser.parse(line)
 				state.onParsing(parsed)
-
-				print("parsed -> " .. vim.inspect(parsed))
 				M.storeTestOutputs(state.allOutputs())
 			end,
 			onExit = function()
-				print("States -> " .. vim.inspect(state.states()))
 				displayResults(state.states(), bufferNum)
 				M.storeTestOutputs(state.allOutputs())
 			end,
 		})
 	end
 
-	saveCommands[setupConfig.pattern] = { save, setupConfig }
+	saveCommands[setupConfig.pattern] = { saveCommand = save, setupConfig = setupConfig }
 	vim.api.nvim_create_autocmd("BufWritePost", {
 		group = group,
 		pattern = setupConfig.pattern,
@@ -171,12 +167,17 @@ M.initializeMarker = function(setupConfig)
 end
 
 M.executeTests = function()
-	print(vim.inspect(saveCommands))
-	for pattern, fn in pairs(saveCommands) do
+	for pattern, value in pairs(saveCommands) do
+		local saveCommand = value.saveCommand
+		local setupConfig = value.setupConfig
+
 		local name = vim.api.nvim_buf_get_name(vim.api.nvim_get_current_buf())
-		if require("gotest.core.strings").endsWith(name, fn[2].interestedFilesSuffix) then
-			print("Matched (really)" .. name .. " to pattern " .. pattern .. " with " .. vim.inspect(fn[2]))
-			fn[1](fn[2])
+		if require("gotest.core.strings").endsWith(name, setupConfig.interestedFilesSuffix) then
+			lazyDebug(function()
+				return "Matched " ..
+				name .. " to pattern " .. pattern .. " with " .. vim.inspect(setupConfig)
+			end)
+			saveCommand(setupConfig)
 			return
 		end
 	end

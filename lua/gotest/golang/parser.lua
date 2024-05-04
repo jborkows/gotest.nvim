@@ -10,7 +10,6 @@ M.parse = function(text)
 	lazyDebug(function()
 		return "Processing: " .. text
 	end)
-	print("Nop non nop")
 	if not core.startsWith(text, "{") then
 		return core.ParsingResult:none()
 	end

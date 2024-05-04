@@ -49,7 +49,6 @@ local stateReactor = function(state, key)
 		state = state,
 		key = key,
 	}
-	print(vim.inspect(M.__states))
 end
 
 ---@param message ParsingResult

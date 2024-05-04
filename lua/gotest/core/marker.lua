@@ -35,20 +35,9 @@ M.displayResults = function(ns, viewFactoryFun, find_test_line)
 		lazyDebug(function()
 			return "Found states: " .. vim.inspect(states)
 		end)
-		print("States -> " .. vim.inspect(states))
 		for key, singleState in pairs(states) do
-			print(
-				key.packageName
-				.. ":"
-				.. key.testName
-				.. "->"
-				.. vim.inspect(singleState)
-				.. " <- "
-				.. vim.inspect(buffers)
-			)
 			local file_buffer_no = find_buffer(buffers, key)
 			if file_buffer_no == nil then
-				print("Cannot find buffer")
 				goto finish
 			end
 
@@ -58,7 +47,6 @@ M.displayResults = function(ns, viewFactoryFun, find_test_line)
 				lazyDebug(function()
 					return "For " .. vim.inspect(key) .. "cannot find line"
 				end)
-				print("For " .. vim.inspect(key) .. "cannot find line")
 
 				goto finish
 			end
@@ -73,7 +61,6 @@ M.displayResults = function(ns, viewFactoryFun, find_test_line)
 
 				table.insert(success[file_buffer_no], found_line)
 
-				print("Inserting success into " .. file_buffer_no .. " at line " .. found_line)
 				goto finish
 			end
 			if singleState == "failure" then
@@ -96,7 +83,6 @@ M.displayResults = function(ns, viewFactoryFun, find_test_line)
 			return "Found success: " .. vim.inspect(success)
 		end)
 
-		print("Found success: " .. vim.inspect(success))
 		for buffer_no, lines in pairs(success) do
 			local view = viewFactory.viewFor(ns, buffer_no)
 			view.showSuccess(lines)

@@ -36,7 +36,6 @@ local M = {
 	---@param buffor_number integer
 	---@return MarkerView
 	viewFor = function(ns, buffor_number)
-		print("Original view for is called")
 		local view = {
 			---@param failures table<Failure>
 			showFailures = function(failures)
