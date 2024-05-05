@@ -27,7 +27,7 @@ Attach command on save which runs the tests in command line. It tries marking al
 Shows last test execution
 
 ## TODO:
-fix issue with cache of golang test
+fix issue with cache of golang test -> state of tests should be stored on disk and reloaded 
 
 
 
