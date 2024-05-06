@@ -73,6 +73,7 @@ M.setup = function(functions)
 		end,
 		testCommand = __Config.command,
 		findTestLine = query.find_test_line,
+		findTestKey = M.findTestKey,
 	})
 end
 

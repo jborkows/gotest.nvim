@@ -98,6 +98,7 @@ end
 ---@field testCommand table<string>
 ---@field bufforNameProcessor fun(text:string, buffnr:integer):string|nil
 ---@field findTestLine fun(buffnr:integer, key:TestIdentifier):integer|nil
+---@field findTestKey fun(line:integer, column:integer):TestIdentifier|nil
 ---@field parserProvider fun():  TestOutputParser
 
 local saveCommands = {}
