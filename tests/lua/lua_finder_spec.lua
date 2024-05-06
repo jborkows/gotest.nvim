@@ -26,4 +26,15 @@ describe("parsing example", function()
 		    luaCore.find(0, core.TestIdentifier:new("lua/lua_finder_spec", "parsing example test C"))
 		assert(notExistingTest == nil, "Should found test C")
 	end)
+
+	it("should find key as same line as function", function()
+		vim.cmd("e tests/lua/lua_finder_spec.lua")
+		local line = 6
+		local column = 1
+		local key = luaCore.findTestKey(line, column)
+		assert.equals(
+			true,
+			luaCore.match(core.TestIdentifier:new("lua/lua_finder_spec", "parsing example test A"), key)
+		)
+	end)
 end)

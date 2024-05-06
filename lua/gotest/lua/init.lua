@@ -25,6 +25,8 @@ M.parser = function(test_package_prefix)
 	return parser.parser(test_package_prefix)
 end
 
+M.findTestKey = query.findTestKey
+
 ---comment
 ---@param bufnr integer
 ---@param key TestIdentifier
