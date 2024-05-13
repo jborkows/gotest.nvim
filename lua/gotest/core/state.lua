@@ -94,9 +94,6 @@ function TestStateManager:changeState(message)
 	local key = event.key
 	local testState = self:get(key)
 	local machineState = testState:translate()
-	if machineState == "notstarted" then
-		--NOP
-	end
 	testState.state = state
 end
 
