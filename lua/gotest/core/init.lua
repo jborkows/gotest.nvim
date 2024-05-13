@@ -208,6 +208,8 @@ vim.api.nvim_create_user_command("TestResult", function()
 			if require("gotest.core.tableutils").isEmpty(messages) then
 				return
 			end
+
+			require("gotest.core.show").showSingle(key, messages)
 			return
 		end
 	end
