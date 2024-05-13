@@ -191,4 +191,26 @@ vim.api.nvim_create_user_command("ExecuteTests", function()
 	M.executeTests()
 end, {})
 
+vim.api.nvim_create_user_command("TestResult", function()
+	for _, value in pairs(saveCommands) do
+		local setupConfig = value.setupConfig
+
+		local name = vim.api.nvim_buf_get_name(vim.api.nvim_get_current_buf())
+		if require("gotest.core.strings").endsWith(name, setupConfig.interestedFilesSuffix) then
+			local current_pos = vim.api.nvim_win_get_cursor(0)
+			local current_line = current_pos[1]
+			local current_col = current_pos[2]
+			local key = setupConfig.findTestKey(current_line, current_col)
+			if key == nil then
+				return
+			end
+			local messages = state.outputs(key)
+			if require("gotest.core.tableutils").isEmpty(messages) then
+				return
+			end
+			return
+		end
+	end
+end, {})
+
 return M
