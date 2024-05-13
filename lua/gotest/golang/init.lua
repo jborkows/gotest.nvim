@@ -35,6 +35,7 @@ M.setup = function(functions)
 
 	require("gotest.core.tschecker").checkLanguage("go")
 
+	query.initializePrefix()
 	core.initializeMarker({
 
 		interestedFilesSuffix = ".go",

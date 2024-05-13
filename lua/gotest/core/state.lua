@@ -1,5 +1,3 @@
-local loggerModule = require("gotest.core.logging")
-local lazyDebug = loggerModule.lazyDebug
 local M = {}
 
 --- @alias State "start"|"success"|"failure"|"N/A"|"run"
@@ -61,9 +59,6 @@ end
 
 ---@param message string
 function TestState:addMessage(message)
-	lazyDebug(function()
-		return self:asKey() .. " adding '" .. message .. "'"
-	end)
 	table.insert(self.messages, message)
 end
 
@@ -99,6 +94,11 @@ function TestStateManager:changeState(message)
 	local key = event.key
 	local testState = self:get(key)
 	local machineState = testState:translate()
+	if machineState == "notstarted" then
+		--NOP
+	elseif machineState == "finished" and (state == "start" or state == "run") then
+		testState.messages = {}
+	end
 	testState.state = state
 end
 

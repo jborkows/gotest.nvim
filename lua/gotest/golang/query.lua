@@ -1,5 +1,7 @@
 local M = {}
 local core = require("gotest.core")
+local paths = require("gotest.core.paths")
+local strings = require("gotest.core.strings")
 
 local test_function_query_string = [[
 
@@ -98,6 +100,25 @@ M.package_name_query = function(buffnr)
 		end
 	end
 end
+
+local packagePrefix = nil
+M.initializePrefix = function()
+	local filename = paths.relative("go.mod")
+
+	local file = io.open(filename, "r")
+	if file == nil then
+		return
+	end
+	for line in file:lines() do
+		if strings.startsWith(line, "module") then
+			packagePrefix = strings.removePrefix(line, "module ")
+			goto finish
+		end
+	end
+	::finish::
+	file:close()
+end
+
 ---comment
 ---@param line integer
 ---@param column integer
@@ -124,12 +145,22 @@ M.findTestKey = function(line, column)
 				item["functionblock"] = node
 			elseif entry == "_package" then
 				local packageName = vim.treesitter.get_node_text(node, current_buf)
+				if packagePrefix ~= nil then
+					local fileName = vim.api.nvim_buf_get_name(current_buf)
+					if string.find(fileName, "/internal/") ~= nil then
+						packageName = packagePrefix .. "/internal/" .. packageName
+					else
+						packageName = packagePrefix .. "/" .. packageName
+					end
+				end
 				item["packageName"] = packageName
 			end
 		end
 
 		if vim.treesitter.is_in_node_range(item.functionblock, line - 1, column) then
-			return core.TestIdentifier:new(item["packageName"], item["testName"])
+			local packageName = item["packageName"]
+
+			return core.TestIdentifier:new(packageName, item["testName"])
 		end
 	end
 	return nil
