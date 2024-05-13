@@ -80,7 +80,7 @@ M.showSingle = function(key, messages)
 		border = "rounded",
 	}
 	local lines = {}
-	if table.maxn(M._lines) > 0 then
+	if table.maxn(messages) > 0 then
 		for _, value in pairs(messages) do
 			for line in string.gmatch(value, "([^\n]+)") do
 				table.insert(lines, line)
