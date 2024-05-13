@@ -134,7 +134,11 @@ M.initializeMarker = function(setupConfig)
 		local buffor_name = vim.api.nvim_buf_get_name(buffnr)
 
 		local normalized_name = setupConfig.bufforNameProcessor(buffor_name, 0)
-		if normalized_name ~= nil then
+
+		if
+		    normalized_name ~= nil
+		    and require("gotest.core.strings").endsWith(normalized_name, setupConfig.interestedFilesSuffix)
+		then
 			bufferNum[normalized_name] = buffnr
 			vim.api.nvim_buf_clear_namespace(buffnr, ns, 0, -1)
 		end

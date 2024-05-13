@@ -136,13 +136,6 @@ M.onParsing = function(message)
 	end
 	TestStateManager:reactOn(message)
 end
----comment
----@param key TestIdentifier
----@return State
-M.state = function(key)
-	local state = TestStateManager:get(key)
-	return state.status()
-end
 
 ---comment
 ---@return table<TestIdentifier, State>
