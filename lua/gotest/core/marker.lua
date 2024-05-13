@@ -97,4 +97,28 @@ M.displayResults = function(ns, viewFactoryFun, find_test_line)
 		end
 	end
 end
+
+---comment
+---@param states table<TestIdentifier, State>
+---@param viewFactoryFun fun():MarkerViewFactory
+M.onTestFinished = function(states, viewFactoryFun)
+	local failed = {}
+	local successCount = 0
+	local all = 0
+	for key, state in pairs(states) do
+		if state == "failure" then
+			table.insert(failed, key)
+		elseif state == "success" then
+			successCount = successCount + 1
+		end
+		all = all + 1
+	end
+	local view = viewFactoryFun()
+
+	if all == successCount then
+		view.showGlobalSuccess()
+	elseif table.maxn(failed) > 0 then
+		view.showGlobalFailure(failed)
+	end
+end
 return M

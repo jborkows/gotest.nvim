@@ -12,6 +12,8 @@ local failureText = "Failed ❌"
 
 ---@class MarkerViewFactory
 ---@field viewFor fun(ns:integer, buffor_number:integer):MarkerView
+---@field showGlobalSuccess fun()
+---@field showGlobalFailure fun(keys:table<TestIdentifier>)
 
 vim.api.nvim_set_hl(0, "OkMarking", { fg = "#00FF00", bold = false })
 vim.api.nvim_set_hl(0, "FailureMarking", { fg = "#FF0000", bold = false })
@@ -29,8 +31,40 @@ local showFailed = function(buffor_number)
 	print(message)
 end
 
+local showGlobalSuccess = function()
+	local ok, _ = pcall(function()
+		local notify = require("notify")
+		notify.notify("OK", "info", { title = "Tests passed" })
+	end)
+
+	if ok then
+		return
+	end
+	print("Tests passed")
+end
+---comment
+---@param keys table<TestIdentifier>
+local showGlobalFailure = function(keys)
+	local message = "Test failed: "
+	for _, value in ipairs(keys) do
+		message = message .. "\n" .. "\t" .. value.packageName .. "->" .. value.testName
+	end
+
+	local ok, _ = pcall(function()
+		local notify = require("notify")
+		notify.notify(message, "error", { title = "Tests failed" })
+	end)
+
+	if ok then
+		return
+	end
+	print(message)
+end
+
 local M = {
 
+	showGlobalSuccess = showGlobalSuccess,
+	showGlobalFailure = showGlobalFailure,
 	---comment
 	---@param ns integer
 	---@param buffor_number integer

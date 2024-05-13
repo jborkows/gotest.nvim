@@ -7,7 +7,7 @@ M.match = query.match
 
 local __Config = {
 	command = { "go", "test", "./...", "-v", "-race", "-shuffle=on", "-json" },
-	pattern = "*_test.go",
+	pattern = "*.go",
 }
 
 ---

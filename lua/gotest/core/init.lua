@@ -140,8 +140,6 @@ M.initializeMarker = function(setupConfig)
 		end
 		local aParser = setupConfig.parserProvider()
 
-		--TODO make it smarter for cache reasons
-		--rewrite state... to one map
 		state.setup()
 
 		runCommand(setupConfig.testCommand, {
@@ -153,6 +151,9 @@ M.initializeMarker = function(setupConfig)
 			onExit = function()
 				displayResults(state.states(), bufferNum)
 				M.storeTestOutputs(state.allOutputs())
+				marker.onTestFinished(state.states(), function()
+					return markerViewFactory
+				end)
 			end,
 		})
 	end

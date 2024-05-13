@@ -36,6 +36,8 @@ local function spyingMarkerView()
 		viewFor = function(_, _)
 			return MarkerView
 		end,
+		showGlobalSuccess = function() end,
+		showGlobalFailure = function(keys) end,
 	}
 
 	local tableutils = require("gotest.core.tableutils")
