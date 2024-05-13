@@ -96,8 +96,6 @@ function TestStateManager:changeState(message)
 	local machineState = testState:translate()
 	if machineState == "notstarted" then
 		--NOP
-	elseif machineState == "finished" then
-		testState.messages = {}
 	end
 	testState.state = state
 end
