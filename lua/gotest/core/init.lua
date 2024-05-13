@@ -197,14 +197,33 @@ vim.api.nvim_create_user_command("TestResult", function()
 
 		local name = vim.api.nvim_buf_get_name(vim.api.nvim_get_current_buf())
 		if require("gotest.core.strings").endsWith(name, setupConfig.interestedFilesSuffix) then
+			lazyDebug(function()
+				return "Matched " .. name .. " to pattern " .. " with " .. vim.inspect(setupConfig)
+			end)
 			local current_pos = vim.api.nvim_win_get_cursor(0)
 			local current_line = current_pos[1]
 			local current_col = current_pos[2]
 			local key = setupConfig.findTestKey(current_line, current_col)
+
 			if key == nil then
+				lazyDebug(function()
+					return "Not found key for " .. current_line .. ";" .. current_pos
+				end)
 				return
 			end
+
+			lazyDebug(function()
+				return "Found key " .. key.packageName .. "->" .. key.testName
+			end)
 			local messages = state.outputs(key)
+			lazyDebug(function()
+				return "Found "
+				    .. table.maxn(messages)
+				    .. " messages for key "
+				    .. key.packageName
+				    .. "->"
+				    .. key.testName
+			end)
 			if require("gotest.core.tableutils").isEmpty(messages) then
 				return
 			end
