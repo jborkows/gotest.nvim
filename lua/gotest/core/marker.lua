@@ -115,7 +115,7 @@ M.onTestFinished = function(states, viewFactoryFun)
 	end
 	local view = viewFactoryFun()
 
-	if all == successCount then
+	if all == successCount and all > 0 then
 		view.showGlobalSuccess()
 	elseif table.maxn(failed) > 0 then
 		view.showGlobalFailure(failed)
