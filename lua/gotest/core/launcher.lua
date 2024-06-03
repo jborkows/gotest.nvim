@@ -2,9 +2,12 @@ local loggerModule = require("gotest.core.logging")
 local lazyDebug = loggerModule.lazyDebug
 local jobId = nil
 
+---@class JobHandlerExit
+---@field hasFailed boolean
+
 ---@class JobHandler
 ---@field onData fun(line:string)
----@field onExit fun()
+---@field onExit fun(exitResult:JobHandlerExit)
 ---
 
 ---@alias RunCommand fun(command:table<string>, handler: JobHandler>
@@ -20,9 +23,11 @@ local function runCommand(command, handler)
 		return "Running command: " .. vim.inspect(command)
 	end)
 
+	local hasFailed = false
 	jobId = vim.fn.jobstart(command, {
 		stdout_buffered = true,
 		on_stderr = function(_, data)
+			hasFailed = true
 			lazyDebug(function()
 				return "Error stream: " .. vim.inspect(data)
 			end)
@@ -39,7 +44,10 @@ local function runCommand(command, handler)
 		end,
 		on_exit = function()
 			jobId = nil
-			handler.onExit()
+			lazyDebug(function()
+				return "has failed " .. hasFailed
+			end)
+			handler.onExit({ hasFailed = hasFailed })
 		end,
 	})
 end

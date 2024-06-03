@@ -152,7 +152,10 @@ M.initializeMarker = function(setupConfig)
 				state.onParsing(parsed)
 				M.storeTestOutputs(state.allOutputs())
 			end,
-			onExit = function()
+			onExit = function(exitResult)
+				if exitResult.hasFailed then
+					return
+				end
 				displayResults(state.states(), bufferNum)
 				M.storeTestOutputs(state.allOutputs())
 				marker.onTestFinished(state.states(), function()
