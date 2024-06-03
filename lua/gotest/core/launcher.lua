@@ -45,7 +45,11 @@ local function runCommand(command, handler)
 		on_exit = function()
 			jobId = nil
 			lazyDebug(function()
-				return "has failed " .. hasFailed
+				if hasFailed then
+					return "has failed"
+				else
+					return "no failure detected"
+				end
 			end)
 			handler.onExit({ hasFailed = hasFailed })
 		end,
