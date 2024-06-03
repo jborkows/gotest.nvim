@@ -6,7 +6,7 @@ local function runnerFromText(text)
 		for line in text:gmatch("([^\n]+)") do
 			handler.onData(line)
 		end
-		handler.onExit()
+		handler.onExit({ hasFailed = false })
 	end
 end
 
