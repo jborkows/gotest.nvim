@@ -27,7 +27,7 @@ local function runCommand(command, handler)
 	jobId = vim.fn.jobstart(command, {
 		stdout_buffered = true,
 		on_stderr = function(_, data)
-			if data ~= nil and data ~= "" then
+			if data ~= nil and data ~= "" and vim.inspect(data) ~= '{ "" }' then
 				hasFailed = true
 			end
 			lazyDebug(function()
