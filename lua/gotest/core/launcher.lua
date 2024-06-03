@@ -27,7 +27,9 @@ local function runCommand(command, handler)
 	jobId = vim.fn.jobstart(command, {
 		stdout_buffered = true,
 		on_stderr = function(_, data)
-			hasFailed = true
+			if table.maxn(data) > 0 then
+				hasFailed = true
+			end
 			lazyDebug(function()
 				return "Error stream: " .. vim.inspect(data)
 			end)
